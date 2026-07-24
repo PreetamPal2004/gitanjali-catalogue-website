@@ -46,7 +46,7 @@ export default function Header() {
               G
             </div>
             <span className="font-display font-extrabold text-base tracking-tight text-stone-900 dark:text-white">
-              GEETANJALI
+              GITANJALI
             </span>
           </Link>
 
@@ -201,7 +201,7 @@ export default function Header() {
                     {theme === 'light' ? <Moon size={14} /> : <Sun size={14} className="text-amber-400" />}
                   </button>
                 </div>
-                <span className="text-[10px] text-stone-400 dark:text-stone-500 block">Geetanjali Catalogue</span>
+                <span className="text-[10px] text-stone-400 dark:text-stone-500 block">Gitanjali Catalogue</span>
               </div>
             </motion.nav>
           </>

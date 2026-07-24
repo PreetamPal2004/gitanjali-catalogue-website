@@ -19,7 +19,7 @@ export default function Footer() {
                 G
               </div>
               <span className="font-display font-extrabold text-base tracking-tight text-stone-900 dark:text-white">
-                GEETANJALI
+                GITANJALI
               </span>
             </div>
             <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed max-w-xs">
@@ -79,7 +79,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-stone-400 dark:text-stone-500">
-          <p>© {new Date().getFullYear()} Geetanjali Electronics. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Gitanjali Electronics. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <span className="hover:text-stone-600 dark:hover:text-stone-300 cursor-pointer">Privacy Policy</span>
             <span className="hover:text-stone-600 dark:hover:text-stone-300 cursor-pointer">Terms of Service</span>

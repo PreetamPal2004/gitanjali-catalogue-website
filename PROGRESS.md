@@ -1,4 +1,4 @@
-# Geetanjali Electronics — Build Progress
+# Gitanjali Electronics — Build Progress
 
 **Project:** Digital Catalogue PWA  
 **Stack:** React + Vite + TypeScript + Tailwind CSS v4 + Framer Motion  

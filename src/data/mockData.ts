@@ -2,14 +2,14 @@ import type { CMSData } from '../types';
 
 const mockData: CMSData = {
   homepage: {
-    heroTitle: 'Geetanjali Electronics',
+    heroTitle: 'Gitanjali Electronics',
     heroSubtitle: 'Your Trusted Destination for Premium Electronics Since 1995',
     heroImage: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=1400&q=80',
     cta: 'Browse Catalogue',
     announcement: '🎉 Grand Summer Sale — Up to 40% OFF on ACs & Refrigerators!',
   },
   businessInfo: {
-    shopName: 'Geetanjali Electronics',
+    shopName: 'Gitanjali Electronics',
     address: 'Bagati Kantapukur Road (Near Mogra 2No Gram Panchayet Office), Mogra, Hooghly, WB 712 148',
     phone: '+91 91430 05296',
     whatsapp: '919143005296',

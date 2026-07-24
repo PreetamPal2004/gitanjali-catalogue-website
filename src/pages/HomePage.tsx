@@ -322,7 +322,7 @@ export default function HomePage() {
         </h2>
 
         <p className="text-stone-600 dark:text-stone-300 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto font-normal">
-          We believe that the devices you use every day should be beautiful as well as functional. Geetanjali Electronics brings together world-class industrial design with cutting-edge engineering to create products that inspire.
+          We believe that the devices you use every day should be beautiful as well as functional. Gitanjali Electronics brings together world-class industrial design with cutting-edge engineering to create products that inspire.
         </p>
 
         <div className="pt-2">
