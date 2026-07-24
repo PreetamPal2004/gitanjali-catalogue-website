@@ -1,0 +1,204 @@
+/* ===== Google Fonts ===== */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ===== Tailwind v4 Class-based Dark Mode Variant ===== */
+@variant dark (&:where(.dark, .dark *));
+
+/* ===== Tailwind v4 Theme ===== */
+@theme {
+  --font-display: 'Plus Jakarta Sans', 'Noto Sans Bengali', system-ui, sans-serif;
+  --font-sans: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif;
+}
+
+/* ===== Base & Canvas ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.light, body.light {
+  background-color: #f4efe9;
+  color: #1a1816;
+}
+
+html.dark, body.dark {
+  background-color: #12110f;
+  color: #f5f2ed;
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===== Dark Mode Global Text Overrides ===== */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: #ffffff;
+}
+
+.dark p, .dark span, .dark label, .dark li {
+  color: #e7e5e4;
+}
+
+.dark .text-stone-900, .dark .text-stone-800, .dark .text-stone-700 {
+  color: #ffffff;
+}
+
+.dark .text-stone-600, .dark .text-stone-500 {
+  color: #d6d3d1;
+}
+
+.dark .text-stone-400 {
+  color: #a8a29e;
+}
+
+/* ===== Lumina Glass Card System ===== */
+.lumina-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.dark .lumina-card, html.dark .lumina-card {
+  background: rgba(26, 23, 20, 0.88) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  color: #f5f2ed;
+}
+
+/* Lumina Soft Card */
+.lumina-card-subtle {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+}
+
+.dark .lumina-card-subtle, html.dark .lumina-card-subtle {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ===== Buttons & Pills ===== */
+.lumina-btn {
+  background-color: #1a1816;
+  color: #ffffff;
+  border-radius: 100px;
+  padding: 0.65rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: none;
+}
+
+.lumina-btn:hover {
+  background-color: #332f2b;
+  transform: translateY(-1px);
+}
+
+.dark .lumina-btn, html.dark .lumina-btn,
+.dark .lumina-btn *, html.dark .lumina-btn * {
+  color: #12110f !important;
+}
+
+.dark .lumina-btn, html.dark .lumina-btn {
+  background-color: #ffffff !important;
+}
+
+.dark .lumina-btn:hover, html.dark .lumina-btn:hover {
+  background-color: #e8e4de !important;
+}
+
+.lumina-btn-secondary {
+  background: rgba(255, 255, 255, 0.6);
+  color: #1a1816;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 100px;
+  padding: 0.65rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.lumina-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dark .lumina-btn-secondary, html.dark .lumina-btn-secondary {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.dark .lumina-btn-secondary:hover, html.dark .lumina-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* ===== Badges & Pills ===== */
+.lumina-badge {
+  background-color: #1a1816;
+  color: #ffffff;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.8rem;
+  border-radius: 100px;
+  display: inline-block;
+}
+
+.dark .lumina-badge, html.dark .lumina-badge {
+  background-color: #ffffff !important;
+  color: #12110f !important;
+}
+
+/* Header Glass Bar */
+.lumina-header {
+  background: rgba(244, 239, 233, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .lumina-header, html.dark .lumina-header {
+  background: rgba(18, 17, 15, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ===== Custom Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+}
