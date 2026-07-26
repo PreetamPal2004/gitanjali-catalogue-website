@@ -12,9 +12,26 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
 };
 
+function ProductDetailSkeleton() {
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-12 animate-pulse">
+      <div className="w-24 h-4 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="lg:col-span-6 aspect-square rounded-3xl bg-stone-200/80 dark:bg-stone-800/80" />
+        <div className="lg:col-span-6 space-y-4">
+          <div className="w-20 h-4 bg-stone-200/80 dark:bg-stone-800/80 rounded-full" />
+          <div className="w-3/4 h-8 bg-stone-200/80 dark:bg-stone-800/80 rounded-lg" />
+          <div className="w-1/2 h-6 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
+          <div className="w-full h-24 bg-stone-200/80 dark:bg-stone-800/80 rounded-xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { data } = useCMS();
+  const { data, loading } = useCMS();
   const { addToCompare, removeFromCompare, isInCompare, setCompareOpen } = useCompare();
 
   useEffect(() => {
@@ -48,6 +65,10 @@ export default function ProductDetailPage() {
     const sum = productReviews.reduce((acc, r) => acc + (r.rating || 5), 0);
     return (sum / productReviews.length).toFixed(1);
   }, [productReviews]);
+
+  if (loading) {
+    return <ProductDetailSkeleton />;
+  }
 
   if (!product) {
     return (

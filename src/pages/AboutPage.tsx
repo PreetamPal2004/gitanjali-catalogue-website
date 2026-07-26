@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { staggerContainer, staggerItem, fadeInUp, pageTransition } from '../utils/animations';
 
 export default function AboutPage() {
-  const { data } = useCMS();
+  const { data, loading } = useCMS();
   const { t } = useLanguage();
 
   const reasons = [
@@ -64,6 +64,23 @@ export default function AboutPage() {
             r => r.display !== false && (!r.productId || r.productId.trim().toUpperCase() === 'P000')
           );
           const testimonialsList = storeReviews.length > 0 ? storeReviews : (data.testimonials || []).filter(t => t.display);
+
+          if (loading) {
+            return (
+              <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
+                <h2 className="font-display text-2xl sm:text-3xl font-bold text-center mb-8">{t('about_testimonials')}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="lumina-card p-6 h-44 animate-pulse space-y-4">
+                      <div className="w-24 h-4 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
+                      <div className="w-full h-12 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
+                      <div className="w-1/3 h-4 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
+                    </div>
+                  ))}
+                </div>
+              </motion.section>
+            );
+          }
 
           return testimonialsList.length > 0 ? (
             <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>

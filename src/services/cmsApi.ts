@@ -56,7 +56,7 @@ export async function fetchCMSData(): Promise<CMSData> {
             display: r.display !== false && String(r.display).toLowerCase() !== 'false' && String(r.status).toLowerCase() !== 'hidden',
           };
         })
-      : mockData.reviews;
+      : [];
 
     const businessInfo = raw.businessInfo ? { ...mockData.businessInfo, ...raw.businessInfo } : mockData.businessInfo;
 
@@ -74,8 +74,8 @@ export async function fetchCMSData(): Promise<CMSData> {
       categories: Array.isArray(raw.categories) ? raw.categories : [],
       offers: Array.isArray(raw.offers) ? raw.offers : [],
       brands: Array.isArray(raw.brands) ? raw.brands : [],
-      services: Array.isArray(raw.services) ? raw.services : [],
-      testimonials: Array.isArray(raw.testimonials) ? raw.testimonials : mockData.testimonials,
+      services: Array.isArray(raw.services) && raw.services.length > 0 ? raw.services : mockData.services,
+      testimonials: Array.isArray(raw.testimonials) ? raw.testimonials : [],
       reviews: sanitizedReviews,
       businessInfo,
       gallery: sanitizedGallery,
