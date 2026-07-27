@@ -61,12 +61,20 @@ export default function ProductDetailPage() {
   }, [data.reviews, product, localReviews]);
 
   const avgRating = useMemo(() => {
-    if (productReviews.length === 0) return '5.0';
+    if (productReviews.length === 0) return 'No Rating';
     const sum = productReviews.reduce((acc, r) => acc + (r.rating || 5), 0);
     return (sum / productReviews.length).toFixed(1);
   }, [productReviews]);
 
-  if (loading) {
+  const brandLogoUrl = useMemo(() => {
+    if (product?.brandLogo && product.brandLogo.trim()) return product.brandLogo.trim();
+    const match = (data.brands || []).find(
+      b => b.name.trim().toLowerCase() === (product?.brand || '').trim().toLowerCase()
+    );
+    return match?.logo || match?.brandLogo || '';
+  }, [product, data.brands]);
+
+  if (loading && !product) {
     return <ProductDetailSkeleton />;
   }
 
@@ -136,8 +144,19 @@ export default function ProductDetailPage() {
         {/* Right column - Details */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp} className="lg:col-span-6 space-y-6">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="lumina-badge">{product.brand}</span>
+            {/* Brand Logo & Category above product name */}
+            <div className="flex items-center gap-3 pb-1">
+              {brandLogoUrl ? (
+                <div className="h-8 sm:h-10 max-w-[140px] flex items-center shrink-0">
+                  <img
+                    src={brandLogoUrl}
+                    alt={product.brand}
+                    className="max-h-full max-w-full object-contain filter dark:brightness-110"
+                  />
+                </div>
+              ) : (
+                <span className="lumina-badge">{product.brand}</span>
+              )}
               <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{product.category}</span>
             </div>
 
@@ -150,29 +169,41 @@ export default function ProductDetailPage() {
             {/* Rating Summary Link */}
             <div className="flex items-center gap-2 pt-1">
               <div className="flex items-center gap-1 text-amber-500">
-                <Star size={14} className="fill-amber-500" />
-                <span className="text-xs font-extrabold text-stone-900 dark:text-white">{avgRating}</span>
+                <Star size={25} className="fill-amber-500" />
+                <span className="text-2xl font-extrabold text-stone-900 dark:text-white">{avgRating}</span>
               </div>
               <span className="text-stone-300 dark:text-stone-700">•</span>
               <a href="#reviews-section" className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline">
                 {productReviews.length} Customer Review{productReviews.length !== 1 ? 's' : ''}
               </a>
             </div>
+
+            {/* Product Description */}
+            {product.description && (
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed pt-2">
+                {product.description}
+              </p>
+            )}
           </div>
 
           {/* Pricing */}
           <div className="lumina-card p-5 space-y-1">
-            <div className="flex items-baseline gap-3">
+            <div className="flex items-baseline flex-wrap gap-3">
               <span className="font-display font-extrabold text-3xl text-stone-900 dark:text-white">
                 {formatPrice(product.sellingPrice)}
               </span>
               {product.mrp > product.sellingPrice && (
-                <span className="text-sm text-stone-400 line-through">
-                  {formatPrice(product.mrp)}
-                </span>
+                <>
+                  <span className="text-base text-stone-400 line-through">
+                    {formatPrice(product.mrp)}
+                  </span>
+                  <span className="font-display font-extrabold text-xl text-emerald-600 dark:text-emerald-400">
+                    {calcDiscount(product.mrp, product.sellingPrice)}% OFF
+                  </span>
+                </>
               )}
             </div>
-            <p className="text-[11px] text-stone-500 dark:text-stone-400">
+            <p className="text-[11px] text-stone-500 dark:text-stone-400 pt-1">
               Inclusive of all taxes •
             </p>
           </div>
@@ -302,8 +333,9 @@ export default function ProductDetailPage() {
         {/* Rating Breakdown Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between bg-stone-100 dark:bg-stone-900 text-black dark:text-white border border-stone-200 dark:border-stone-800 p-6 rounded-3xl gap-4">
           <div className="flex items-center gap-4">
-            <div className="font-display font-extrabold text-4xl sm:text-5xl tracking-tight text-black dark:text-white">
-              {avgRating} <span className="text-amber-500 text-3xl">★</span>
+            <div className="flex items-center gap-2 font-display font-extrabold text-4xl sm:text-3xl tracking-tight text-black dark:text-white">
+              {avgRating} 
+              <Star size={35} strokeWidth={0} className="fill-amber-500" />
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">

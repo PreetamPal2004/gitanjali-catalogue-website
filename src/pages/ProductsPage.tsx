@@ -530,27 +530,52 @@ export default function ProductsPage() {
 
                         {/* Category + Specs Summary */}
                         <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-1 truncate">{p.category}</p>
-                        <p className="text-[10px] sm:text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-1">
+                        <p className="text-[10px] sm:text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-1 ">
                           {p.features.slice(0, 3).join(' • ')}
                         </p>
 
-                        {/* Price Line: Selling Price + Slashed MRP + Discount */}
-                        <div className="flex items-center gap-1.5 flex-wrap mt-3 pt-3 border-t border-stone-200/40 dark:border-stone-700/40">
-                          <span className="text-stone-900 dark:text-white font-extrabold text-sm sm:text-base">{formatPrice(p.sellingPrice)}</span>
+                        {/* Discount + Price Container with Top Border above discount */}
+                        <div className="mt-3 pt-2.5 border-t border-stone-200/40 dark:border-stone-700/40 space-y-1.5">
                           {p.mrp > p.sellingPrice && (
-                            <>
-                              <span className="text-[9px] sm:text-[10px] text-stone-400 line-through">{formatPrice(p.mrp)}</span>
-                              <span className="text-[8px] sm:text-[9px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-1.5 py-0.5 rounded-full">
+                            <div>
+                              <span className="text-[11px] sm:text-[13px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full inline-block">
                                 {calcDiscount(p.mrp, p.sellingPrice)}% OFF
                               </span>
-                            </>
+                            </div>
                           )}
+
+                          {/* Price Line: Selling Price + Slashed MRP */}
+                          <div className="flex items-baseline gap-1.5 flex-wrap">
+                            <span className="text-stone-900 dark:text-white font-extrabold text-xl sm:text-xl">{formatPrice(p.sellingPrice)}</span>
+                            {p.mrp > p.sellingPrice && (
+                              <span className="text-[9px] sm:text-[10px] text-stone-400 line-through">{formatPrice(p.mrp)}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
                       {/* Compare toggle footer */}
                       <div className="pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-stone-200/50 dark:border-stone-800/50 flex items-center justify-between text-[9px] sm:text-[10px]">
-                        <span className="text-stone-400 font-medium truncate max-w-[65px] sm:max-w-none">{p.brand}</span>
+                        {(() => {
+                          const logoUrl = (p.brandLogo && p.brandLogo.trim())
+                            ? p.brandLogo.trim()
+                            : (data.brands || []).find(b => b.name.trim().toLowerCase() === (p.brand || '').trim().toLowerCase())?.logo || (data.brands || []).find(b => b.name.trim().toLowerCase() === (p.brand || '').trim().toLowerCase())?.brandLogo || '';
+
+                          if (logoUrl) {
+                            return (
+                              <div className="h-4 sm:h-5 max-w-[55px] sm:max-w-[75px] flex items-center shrink-0">
+                                <img
+                                  src={logoUrl}
+                                  alt={p.brand}
+                                  className="max-h-full max-w-full object-contain filter dark:brightness-110"
+                                />
+                              </div>
+                            );
+                          }
+                          return (
+                            <span className="text-stone-400 font-medium truncate max-w-[65px] sm:max-w-none">{p.brand}</span>
+                          );
+                        })()}
                         <button
                           onClick={(e) => {
                             e.preventDefault();

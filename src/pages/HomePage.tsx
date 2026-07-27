@@ -135,19 +135,30 @@ export default function HomePage() {
             ) : (
               <Link to={`/products/${heroProduct.slug}`}>
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] group border border-white/60 dark:border-white/10 cursor-pointer">
+                  {/* Top Right Corner Discount Badge */}
+                  {heroProduct.mrp > heroProduct.sellingPrice && (
+                    <div className="absolute top-3 right-3 bg-amber-500 text-stone-950 font-extrabold text-[11px] sm:text-xs uppercase px-2.5 py-1 rounded-full shadow-lg border border-amber-300/40 z-10">
+                      {calcDiscount(heroProduct.mrp, heroProduct.sellingPrice)}% OFF
+                    </div>
+                  )}
+
                   <img
                     src={heroProduct.images && heroProduct.images[0] ? heroProduct.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=75'}
                     alt={heroProduct.name}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 text-white space-y-1.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
                       FLAGSHIP SHOWCASE
                     </span>
-                    <p className="font-display font-bold text-sm mt-1.5 line-clamp-1">{heroProduct.name}</p>
-                    <p className="text-xs text-amber-300 font-semibold">{formatPrice(heroProduct.sellingPrice)}</p>
+                    <p className="font-display font-bold text-sm sm:text-base line-clamp-1">{heroProduct.name}</p>
+                    <div className="pt-0.5">
+                      <span className="inline-block bg-emerald-600 text-white font-extrabold text-[16px] px-3.5 py-1 rounded-full shadow-md">
+                        {formatPrice(heroProduct.sellingPrice)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -228,6 +239,13 @@ export default function HomePage() {
 
                       <div className="pt-3 border-t border-stone-200/60 dark:border-stone-800/60 flex items-center justify-between">
                         <div>
+                          {discount > 0 && (
+                            <div className="mb-1">
+                              <span className="text-[12px] font-extrabold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full inline-block">
+                                {discount}% OFF
+                              </span>
+                            </div>
+                          )}
                           <span className="font-display font-extrabold text-base text-stone-900 dark:text-white">
                             {formatPrice(product.sellingPrice)}
                           </span>

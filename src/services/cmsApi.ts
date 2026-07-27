@@ -70,10 +70,14 @@ export async function fetchCMSData(): Promise<CMSData> {
         ];
 
     const sanitizedProducts = Array.isArray(raw.products)
-      ? raw.products.map((p: any) => ({
-          ...p,
-          warranty: String(p.warranty || p.Warranty || p.WARRANTY || p['Warranty Period'] || p['warranty_period'] || p.warrantyPeriod || '1 Year Manufacturer Warranty'),
-        }))
+      ? raw.products.map((p: any) => {
+          const rawBrandLogo = p.brandLogo || p.brand_logo || p.BrandLogo || p['Brand Logo'] || p['brand logo'] || p.logo || p.Logo || '';
+          return {
+            ...p,
+            brandLogo: rawBrandLogo ? String(rawBrandLogo).trim() : '',
+            warranty: String(p.warranty || p.Warranty || p.WARRANTY || p['Warranty Period'] || p['warranty_period'] || p.warrantyPeriod || '1 Year Manufacturer Warranty'),
+          };
+        })
       : [];
 
     return {
