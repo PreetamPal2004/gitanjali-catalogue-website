@@ -87,6 +87,54 @@ export default function ProductsPage() {
   // Featured launch product (first active product or highlighted item)
   const featuredLaunch = data.products.find(p => p.active) || data.products[0];
 
+  // Dynamically derive categories from active products in the Products sheet + Categories sheet
+  const categories = useMemo(() => {
+    const catMap = new Map<string, { name: string; slug: string; count: number }>();
+    const activeProducts = data.products.filter(p => p.active !== false);
+
+    // 1. Extract categories directly from the products sheet
+    for (const p of activeProducts) {
+      const rawCat = (p.category || '').trim();
+      if (!rawCat) continue;
+      const lowerKey = rawCat.toLowerCase();
+      const existing = catMap.get(lowerKey);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        catMap.set(lowerKey, {
+          name: rawCat,
+          slug: rawCat.toLowerCase().replace(/\s+/g, '-'),
+          count: 1,
+        });
+      }
+    }
+
+    // 2. Add categories from Categories sheet if not already present
+    if (Array.isArray(data.categories)) {
+      for (const c of data.categories) {
+        if (!c || !c.name) continue;
+        const rawCat = String(c.name).trim();
+        if (!rawCat) continue;
+        const lowerKey = rawCat.toLowerCase();
+
+        if (!catMap.has(lowerKey)) {
+          const count = activeProducts.filter(p => (p.category || '').trim().toLowerCase() === lowerKey).length;
+          catMap.set(lowerKey, {
+            name: rawCat,
+            slug: c.slug || rawCat.toLowerCase().replace(/\s+/g, '-'),
+            count,
+          });
+        }
+      }
+    }
+
+    return Array.from(catMap.values());
+  }, [data.products, data.categories]);
+
+  const activeTotalCount = useMemo(() => {
+    return data.products.filter(p => p.active !== false).length;
+  }, [data.products]);
+
   const filtered = useMemo(() => {
     let items = data.products.filter(p => p.active !== false);
 
@@ -101,10 +149,12 @@ export default function ProductsPage() {
     }
 
     if (selectedCategory) {
-      items = items.filter(p =>
-        p.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory ||
-        p.category === selectedCategory
-      );
+      const target = selectedCategory.trim().toLowerCase();
+      items = items.filter(p => {
+        const catName = (p.category || '').trim().toLowerCase();
+        const catSlug = catName.replace(/\s+/g, '-');
+        return catName === target || catSlug === target;
+      });
     }
 
     if (selectedBrand) {
@@ -118,7 +168,7 @@ export default function ProductsPage() {
     return items;
   }, [data.products, searchFromUrl, selectedCategory, selectedBrand, featuredOnly]);
 
-  const brands = [...new Set(data.products.map(p => p.brand))];
+  const brands = [...new Set(data.products.filter(p => p.active !== false).map(p => p.brand))];
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
@@ -172,17 +222,18 @@ export default function ProductsPage() {
                           }`}
                         >
                           <span>All Products</span>
-                          <span className="text-[10px] text-stone-400">{data.products.length}</span>
+                          <span className="text-[10px] text-stone-400">{activeTotalCount}</span>
                         </button>
 
-                        {data.categories.map(c => {
-                          const count = data.products.filter(p => p.category === c.name).length;
-                          const isSelected = selectedCategory === c.slug || selectedCategory === c.name;
+                        {categories.map(c => {
+                          const isSelected =
+                            selectedCategory.trim().toLowerCase() === c.slug.toLowerCase() ||
+                            selectedCategory.trim().toLowerCase() === c.name.toLowerCase();
 
                           return (
                             <button
                               key={c.slug}
-                              onClick={() => setSelectedCategory(isSelected ? '' : c.slug)}
+                              onClick={() => setSelectedCategory(isSelected ? '' : c.name)}
                               className={`w-full flex items-center justify-between text-xs py-2 px-2.5 rounded-xl transition-colors ${
                                 isSelected
                                   ? 'font-bold text-stone-900 dark:text-white bg-stone-200/50 dark:bg-stone-800/50'
@@ -190,7 +241,7 @@ export default function ProductsPage() {
                               }`}
                             >
                               <span>{c.name}</span>
-                              <span className="text-[10px] text-stone-400">{count}</span>
+                              <span className="text-[10px] text-stone-400">{c.count}</span>
                             </button>
                           );
                         })}
@@ -272,17 +323,18 @@ export default function ProductsPage() {
                   }`}
                 >
                   <span>All Products</span>
-                  <span className="text-[10px] text-stone-400">{data.products.length}</span>
+                  <span className="text-[10px] text-stone-400">{activeTotalCount}</span>
                 </button>
 
-                {data.categories.map(c => {
-                  const count = data.products.filter(p => p.category === c.name).length;
-                  const isSelected = selectedCategory === c.slug || selectedCategory === c.name;
+                {categories.map(c => {
+                  const isSelected =
+                    selectedCategory.trim().toLowerCase() === c.slug.toLowerCase() ||
+                    selectedCategory.trim().toLowerCase() === c.name.toLowerCase();
 
                   return (
                     <button
                       key={c.slug}
-                      onClick={() => setSelectedCategory(isSelected ? '' : c.slug)}
+                      onClick={() => setSelectedCategory(isSelected ? '' : c.name)}
                       className={`w-full flex items-center justify-between text-xs py-2 px-2.5 rounded-xl transition-colors ${
                         isSelected
                           ? 'font-bold text-stone-900 dark:text-white bg-stone-200/50 dark:bg-stone-800/50'
@@ -290,7 +342,7 @@ export default function ProductsPage() {
                       }`}
                     >
                       <span>{c.name}</span>
-                      <span className="text-[10px] text-stone-400">{count}</span>
+                      <span className="text-[10px] text-stone-400">{c.count}</span>
                     </button>
                   );
                 })}
