@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Grid3X3, List, ArrowRight, Plus, Check, Star, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Grid3X3, List, ArrowRight, Plus, Check, Star, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useCompare } from '../context/CompareContext';
 import { formatPrice, calcDiscount } from '../utils/formatters';
@@ -52,9 +52,12 @@ function FeaturedLaunchSkeleton() {
 }
 
 export default function ProductsPage() {
+  const navigate = useNavigate();
   const { data, loading } = useCMS();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const [searchParams] = useSearchParams();
+
+  const catalogGridRef = useRef<HTMLDivElement>(null);
 
   const searchFromUrl = searchParams.get('search') || '';
   const categoryFromUrl = searchParams.get('category') || '';
@@ -66,6 +69,20 @@ export default function ProductsPage() {
   const [featuredOnly, setFeaturedOnly] = useState(featuredFromUrl);
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Sync state with URL search parameters
+  useEffect(() => {
+    setSelectedCategory(categoryFromUrl);
+    setSelectedBrand(brandFromUrl);
+    setFeaturedOnly(featuredFromUrl);
+  }, [categoryFromUrl, brandFromUrl, featuredFromUrl]);
+
+  // Smooth scroll to catalog grid when user searches
+  useEffect(() => {
+    if (searchFromUrl && catalogGridRef.current) {
+      catalogGridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [searchFromUrl]);
 
   // Featured launch product (first active product or highlighted item)
   const featuredLaunch = data.products.find(p => p.active) || data.products[0];
@@ -336,61 +353,77 @@ export default function ProductsPage() {
 
         {/* ===== MAIN CONTENT ===== */}
         <main className="lg:col-span-9 space-y-8">
-          {/* Featured Launch Hero Card */}
-          {loading ? (
-            <FeaturedLaunchSkeleton />
-          ) : featuredLaunch ? (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              className="lumina-card p-6 md:p-8 overflow-hidden relative"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                <div className="md:col-span-7 space-y-4">
-                  <h2 className="font-display font-bold text-2xl md:text-3xl tracking-tight text-stone-900 dark:text-white">
-                    {featuredLaunch.name}
-                  </h2>
-                  <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed max-w-md">
-                    {featuredLaunch.description}
-                  </p>
-                  <div className="flex items-center gap-3 pt-2">
-                    <Link to={`/products/${featuredLaunch.slug}`}>
-                      <button className="lumina-btn group text-xs">
-                        <span>View Details</span>
-                        <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+          {/* Featured Launch Hero Card (Hidden during active search) */}
+          {!searchFromUrl && (
+            loading ? (
+              <FeaturedLaunchSkeleton />
+            ) : featuredLaunch ? (
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                className="lumina-card p-6 md:p-8 overflow-hidden relative"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                  <div className="md:col-span-7 space-y-4">
+                    <h2 className="font-display font-bold text-2xl md:text-3xl tracking-tight text-stone-900 dark:text-white">
+                      {featuredLaunch.name}
+                    </h2>
+                    <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed max-w-md">
+                      {featuredLaunch.description}
+                    </p>
+                    <div className="flex items-center gap-3 pt-2">
+                      <Link to={`/products/${featuredLaunch.slug}`}>
+                        <button className="lumina-btn group text-xs">
+                          <span>View Details</span>
+                          <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </Link>
+
+                      <button
+                        onClick={() => isInCompare(featuredLaunch.productId) ? removeFromCompare(featuredLaunch.productId) : addToCompare(featuredLaunch)}
+                        className="px-3 py-1.5 rounded-full bg-stone-200/70 dark:bg-stone-800/70 text-stone-800 dark:text-stone-200 flex items-center gap-1.5 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors text-xs font-semibold"
+                        title="Compare"
+                      >
+                        {isInCompare(featuredLaunch.productId) ? <Check size={14} /> : <Plus size={14} />}
+                        <span>Compare</span>
                       </button>
-                    </Link>
+                    </div>
+                  </div>
 
-                    <button
-                      onClick={() => isInCompare(featuredLaunch.productId) ? removeFromCompare(featuredLaunch.productId) : addToCompare(featuredLaunch)}
-                      className="px-3 py-1.5 rounded-full bg-stone-200/70 dark:bg-stone-800/70 text-stone-800 dark:text-stone-200 flex items-center gap-1.5 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors text-xs font-semibold"
-                      title="Compare"
-                    >
-                      {isInCompare(featuredLaunch.productId) ? <Check size={14} /> : <Plus size={14} />}
-                      <span>Compare</span>
-                    </button>
+                  <div className="md:col-span-5">
+                    <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-amber-400 flex items-center justify-center p-4 shadow-lg">
+                      <img
+                        src={featuredLaunch.images[0]}
+                        alt={featuredLaunch.name}
+                        className="w-full h-full object-contain drop-shadow-md rounded-xl"
+                      />
+                    </div>
                   </div>
                 </div>
+              </motion.div>
+            ) : null
+          )}
 
-                <div className="md:col-span-5">
-                  <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-amber-400 flex items-center justify-center p-4 shadow-lg">
-                    <img
-                      src={featuredLaunch.images[0]}
-                      alt={featuredLaunch.name}
-                      className="w-full h-full object-contain drop-shadow-md rounded-xl"
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ) : null}
-
-          {/* Grid Header */}
-          <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-xl tracking-tight text-stone-900 dark:text-white">
-              Latest Catalogue
-            </h2>
+          {/* Grid Header & Search Anchor */}
+          <div ref={catalogGridRef} className="flex items-center justify-between flex-wrap gap-3 scroll-mt-24">
+            <div>
+              <h2 className="font-display font-bold text-xl tracking-tight text-stone-900 dark:text-white">
+                {searchFromUrl ? 'Catalogue Search Results' : 'Latest Catalogue'}
+              </h2>
+              {searchFromUrl && (
+                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 flex items-center gap-1.5">
+                  <span>Results for <strong className="text-stone-900 dark:text-white">"{searchFromUrl}"</strong> ({filtered.length} product{filtered.length !== 1 ? 's' : ''})</span>
+                  <button
+                    onClick={() => navigate('/products')}
+                    className="text-amber-600 dark:text-amber-400 hover:underline font-bold text-[11px] flex items-center gap-0.5 ml-1"
+                  >
+                    <X size={12} />
+                    <span>Clear search</span>
+                  </button>
+                </p>
+              )}
+            </div>
 
             <div className="flex items-center gap-1 bg-stone-200/50 dark:bg-stone-800/50 p-1 rounded-full text-xs">
               <button
