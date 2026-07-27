@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { CMSProvider } from './context/CMSContext';
@@ -15,7 +16,17 @@ import GalleryPage from './pages/GalleryPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 
-import { useEffect } from 'react';
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return isMobile;
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -53,17 +64,21 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  const isMobile = useIsMobile();
+
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <LanguageProvider>
-          <CMSProvider>
-            <CompareProvider>
-              <AnimatedRoutes />
-            </CompareProvider>
-          </CMSProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <MotionConfig reducedMotion={isMobile ? 'always' : 'never'}>
+      <BrowserRouter>
+        <ThemeProvider>
+          <LanguageProvider>
+            <CMSProvider>
+              <CompareProvider>
+                <AnimatedRoutes />
+              </CompareProvider>
+            </CMSProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </MotionConfig>
   );
 }

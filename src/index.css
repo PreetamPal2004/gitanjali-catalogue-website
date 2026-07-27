@@ -391,3 +391,34 @@ html.dark input::placeholder, html.dark textarea::placeholder,
 .animate-brand-marquee:hover {
   animation-play-state: paused;
 }
+
+/* ===== Mobile View Animation Removal & Performance Optimization ===== */
+@media (max-width: 768px) {
+  /* Disable CSS keyframe animations & heavy transitions on mobile */
+  *, ::before, ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /* Disable marquee continuous sliding on mobile */
+  .animate-brand-marquee {
+    animation: none !important;
+  }
+
+  /* Disable skeleton pulses on mobile */
+  .animate-pulse {
+    animation: none !important;
+    opacity: 0.75;
+  }
+
+  /* Disable heavy backdrop blurs on mobile GPU */
+  .backdrop-blur-md,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-sm,
+  .lumina-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
