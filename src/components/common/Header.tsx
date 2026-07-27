@@ -54,25 +54,25 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 shadow-sm transition-colors">
-        <div className="max-w-7xl mx-auto px-6 py-2.5">
+        <div className="max-w-7xl mx-auto px-6 py-2.5 md:py-3.5">
           {/* Top Row: Logo, Nav, Actions */}
-          <div className="flex items-center justify-between gap-4 h-12">
+          <div className="flex items-center justify-between gap-4 h-12 md:h-14">
             {/* Brand Logo */}
-            <Link to="/" className="flex items-center gap-2.5 shrink-0">
-              <div className="w-7 h-7 rounded-lg bg-stone-900 dark:bg-white text-white dark:text-stone-900 font-bold flex items-center justify-center text-xs tracking-tighter shadow-sm">
+            <Link to="/" className="flex items-center gap-2.5 md:gap-3 shrink-0">
+              <div className="w-7 h-7 md:w-9 md:h-9 rounded-lg bg-stone-900 dark:bg-white text-white dark:text-stone-900 font-bold flex items-center justify-center text-xs md:text-sm tracking-tighter shadow-sm">
                 G
               </div>
-              <span className="font-display font-extrabold text-base tracking-tight text-stone-900 dark:text-white">
+              <span className="font-display font-extrabold text-base md:text-[18px] tracking-tight text-stone-900 dark:text-white">
                 GITANJALI
               </span>
             </Link>
 
             {/* Center Nav Links */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-1 md:gap-1.5">
               {links.map(l => (
                 <Link key={l.key} to={l.path}>
                   <span
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    className={`px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-xs lg:text-[14px] font-medium transition-all ${
                       isActive(l.path)
                         ? 'text-stone-900 dark:text-white font-semibold'
                         : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200'
@@ -85,16 +85,17 @@ export default function Header() {
             </nav>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 md:gap-3">
               {/* Compare Button */}
               {compareList.length > 0 && (
                 <button
                   onClick={() => setCompareOpen(true)}
-                  className="relative p-2 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-800 dark:text-stone-200 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+                  className="relative px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-800 dark:text-stone-200 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors flex items-center gap-1.5 text-xs md:text-[14px] font-bold"
                   title="Compare products"
                 >
-                  <GitCompareArrows size={15} />
-                  <span className="absolute -top-1 -right-1 bg-amber-400 text-stone-950 font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+                  <GitCompareArrows className="w-3.5 h-3.5 md:w-[17px] md:h-[17px]" />
+                  <span>Compare</span>
+                  <span className="bg-amber-400 text-stone-950 font-extrabold text-[10px] md:text-[12px] px-1.5 py-0.5 rounded-full min-w-[16px] md:min-w-[20px] text-center ml-0.5">
                     {compareList.length}
                   </span>
                 </button>
@@ -103,19 +104,19 @@ export default function Header() {
               {/* Language Toggle */}
               <button
                 onClick={toggleLanguage}
-                className="hidden md:flex px-2.5 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-[11px] font-semibold text-stone-700 dark:text-stone-300 items-center gap-1 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+                className="hidden md:flex px-3.5 py-1.5 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-[13px] font-semibold text-stone-700 dark:text-stone-300 items-center gap-1.5 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
               >
-                <Globe size={12} />
+                <Globe size={14} />
                 {language === 'en' ? 'BN' : 'EN'}
               </button>
 
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="hidden md:block p-2 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+                className="hidden md:block p-2.5 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
                 aria-label="Toggle theme"
               >
-                {theme === 'light' ? <Moon size={14} /> : <Sun size={14} className="text-amber-400" />}
+                {theme === 'light' ? <Moon size={16} /> : <Sun size={16} className="text-amber-400" />}
               </button>
 
               {/* Mobile Menu Trigger */}
@@ -130,11 +131,11 @@ export default function Header() {
           </div>
 
           {/* Centered Search Bar Row — Directly below logo/nav in middle of header on PC & Mobile */}
-          <div className="pt-2 pb-0.5 flex justify-center">
-            <form onSubmit={handleSearchSubmit} className="w-full max-w-md">
+          <div className="pt-2.5 pb-0.5 flex justify-center">
+            <form onSubmit={handleSearchSubmit} className="w-full max-w-md md:max-w-xl">
               <div className="search-wrapper w-full">
                 <div className="search-inner">
-                  <Search size={13} className="absolute left-4 z-10 text-stone-400 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 md:w-[15px] md:h-[15px] absolute left-4 z-10 text-stone-400 pointer-events-none" />
                   <input
                     type="text"
                     placeholder="Search products..."
@@ -143,7 +144,7 @@ export default function Header() {
                     className="search-input"
                   />
                   <button type="submit" className="search-icon-btn" aria-label="Search">
-                    <Search size={14} />
+                    <Search className="w-3.5 h-3.5 md:w-[16px] md:h-[16px]" />
                   </button>
                 </div>
               </div>

@@ -32,7 +32,7 @@ function ProductDetailSkeleton() {
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data, loading } = useCMS();
-  const { addToCompare, removeFromCompare, isInCompare, setCompareOpen } = useCompare();
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -206,7 +206,6 @@ export default function ProductDetailPage() {
                   removeFromCompare(product.productId);
                 } else {
                   addToCompare(product);
-                  setCompareOpen(true);
                 }
               }}
               className={`w-full py-2.5 px-4 rounded-full text-xs font-extrabold border transition-all flex items-center justify-center gap-2 ${
@@ -227,9 +226,9 @@ export default function ProductDetailPage() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               {product.features.map((feat, i) => (
-                <div key={i} className="flex items-center gap-2 text-stone-600 dark:text-stone-300">
-                  <Check size={13} className="text-green-500 shrink-0" />
-                  <span>{feat}</span>
+                <div key={i} className="flex items-center gap-2 text-stone-800 dark:text-stone-100">
+                  <Check size={13} className="text-emerald-500 shrink-0" />
+                  <span className="text-stone-800 dark:text-white font-medium">{feat}</span>
                 </div>
               ))}
             </div>

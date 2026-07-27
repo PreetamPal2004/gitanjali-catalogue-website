@@ -22,11 +22,29 @@ export default function ContactPage() {
         <div className="lg:col-span-6 space-y-4">
           <div className="lumina-card p-5 flex items-center gap-4">
             <div className="w-10 h-10 rounded-2xl bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white flex items-center justify-center shrink-0">
+              <MapPin size={18} />
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-xs uppercase tracking-wider text-stone-400">Address</h3>
+              <a
+                href={info.maps}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-bold text-stone-900 dark:text-white hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5"
+              >
+                <span>{info.address}</span>
+                <ExternalLink size={13} className="shrink-0 text-stone-400" />
+              </a>
+            </div>
+          </div>
+
+          <div className="lumina-card p-5 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-2xl bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-white flex items-center justify-center shrink-0">
               <Phone size={18} />
             </div>
             <div>
               <h3 className="font-display font-bold text-xs uppercase tracking-wider text-stone-400">Phone</h3>
-              <a href={`tel:${info.phone}`} className="text-sm font-bold text-stone-900 dark:text-white">{info.phone}</a>
+              <a href={`tel:${info.phone}`} className="text-sm font-bold text-stone-900 dark:text-white hover:underline">{info.phone}</a>
             </div>
           </div>
 
@@ -36,7 +54,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="font-display font-bold text-xs uppercase tracking-wider text-stone-400">Email</h3>
-              <a href={`mailto:${info.email}`} className="text-sm font-bold text-stone-900 dark:text-white">{info.email}</a>
+              <a href={`mailto:${info.email}`} className="text-sm font-bold text-stone-900 dark:text-white hover:underline">{info.email}</a>
             </div>
           </div>
 
@@ -54,7 +72,7 @@ export default function ContactPage() {
         <div className="lg:col-span-6 space-y-4">
           <div className="lumina-card p-3 aspect-[4/3] overflow-hidden">
             <iframe
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(info.address)}&output=embed`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent('গীতাঞ্জলি ইলেকট্রনিক্স, Mogra, Amodghata, West Bengal 712148, India')}&output=embed`}
               width="100%"
               height="100%"
               style={{ border: 0, borderRadius: 16 }}

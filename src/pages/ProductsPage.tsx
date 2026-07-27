@@ -364,10 +364,11 @@ export default function ProductsPage() {
 
                     <button
                       onClick={() => isInCompare(featuredLaunch.productId) ? removeFromCompare(featuredLaunch.productId) : addToCompare(featuredLaunch)}
-                      className="w-8 h-8 rounded-full bg-stone-200/70 dark:bg-stone-800/70 text-stone-800 dark:text-stone-200 flex items-center justify-center hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
+                      className="px-3 py-1.5 rounded-full bg-stone-200/70 dark:bg-stone-800/70 text-stone-800 dark:text-stone-200 flex items-center gap-1.5 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors text-xs font-semibold"
                       title="Compare"
                     >
                       {isInCompare(featuredLaunch.productId) ? <Check size={14} /> : <Plus size={14} />}
+                      <span>Compare</span>
                     </button>
                   </div>
                 </div>

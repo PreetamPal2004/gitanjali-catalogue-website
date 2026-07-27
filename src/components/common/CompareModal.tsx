@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, ArrowRight, GitCompareArrows, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -6,6 +7,21 @@ import { formatPrice } from '../../utils/formatters';
 
 export default function CompareModal() {
   const { compareList, removeFromCompare, clearCompare, isCompareOpen, setCompareOpen } = useCompare();
+
+  // Lock background scroll when compare modal is open
+  useEffect(() => {
+    if (isCompareOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isCompareOpen]);
 
   if (compareList.length === 0) return null;
 
@@ -22,41 +38,41 @@ export default function CompareModal() {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-stone-900/90 dark:bg-stone-100/95 backdrop-blur-xl text-white dark:text-stone-900 px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 border border-white/20 dark:border-stone-800"
+          className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 bg-stone-900/95 dark:bg-stone-900/95 backdrop-blur-xl text-white px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-2xl flex items-center justify-between sm:justify-start gap-2 sm:gap-4 border border-stone-700/80 w-[94%] max-w-sm sm:max-w-none sm:w-auto"
         >
-          <div className="flex items-center gap-2">
-            <GitCompareArrows size={16} className="text-amber-400 dark:text-amber-600 animate-pulse" />
-            <span className="text-xs font-bold">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <GitCompareArrows size={15} className="text-amber-400 animate-pulse shrink-0" />
+            <span className="text-[11px] sm:text-xs font-bold text-white tracking-tight sm:tracking-wide whitespace-nowrap">
               {compareList.length} Product{compareList.length > 1 ? 's' : ''} in Compare
             </span>
           </div>
 
           {/* Product Thumbnails preview */}
-          <div className="hidden sm:flex items-center gap-1.5 border-l border-white/20 dark:border-stone-300 pl-3">
+          <div className="hidden sm:flex items-center gap-1.5 border-l border-stone-700/80 pl-3">
             {compareList.map(p => (
               <img
                 key={p.productId}
                 src={p.images && p.images[0] ? p.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&q=80'}
                 alt={p.name}
-                className="w-7 h-7 rounded-full object-cover border border-white/30"
+                className="w-7 h-7 rounded-full object-cover border border-stone-600"
               />
             ))}
           </div>
 
-          <div className="flex items-center gap-2 border-l border-white/20 dark:border-stone-300 pl-3">
+          <div className="flex items-center gap-1.5 sm:gap-2 border-l border-stone-700/80 pl-2 sm:pl-3 shrink-0">
             <button
               onClick={() => setCompareOpen(true)}
-              className="bg-amber-400 hover:bg-amber-300 text-stone-950 px-3.5 py-1 rounded-full text-xs font-extrabold transition-all flex items-center gap-1 shadow-md"
+              className="bg-amber-400 hover:bg-amber-300 text-stone-950 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-extrabold transition-all flex items-center gap-1 shadow-md whitespace-nowrap"
             >
-              <span>Compare Now</span>
-              <ArrowRight size={13} />
+              <span className="text-stone-950 font-extrabold">Compare Now</span>
+              <ArrowRight size={12} className="text-stone-950 shrink-0" />
             </button>
             <button
               onClick={clearCompare}
-              className="text-stone-400 hover:text-stone-200 dark:text-stone-600 dark:hover:text-stone-900 p-1"
+              className="text-stone-400 hover:text-white p-1 transition-colors shrink-0"
               title="Clear comparison"
             >
-              <X size={15} />
+              <X size={14} />
             </button>
           </div>
         </motion.div>
@@ -81,16 +97,18 @@ export default function CompareModal() {
               onClick={e => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="p-5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between shrink-0">
+              <div className="p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
                     <GitCompareArrows size={18} />
                   </div>
                   <div>
-                    <h2 className="font-display font-bold text-lg text-stone-900 dark:text-white">
+                    <h2 className="font-display font-bold text-base sm:text-lg text-stone-900 dark:text-white">
                       Product Comparison
                     </h2>
-                    <p className="text-xs text-stone-400">Comparing {compareList.length} items</p>
+                    <p className="text-xs text-stone-400">
+                      Comparing {compareList.length} items <span className="sm:hidden text-amber-500 font-medium">• Swipe sideways ↔</span>
+                    </p>
                   </div>
                 </div>
 
@@ -112,124 +130,141 @@ export default function CompareModal() {
               </div>
 
               {/* Modal Content - Scrollable Side-by-Side Table */}
-              <div className="p-6 overflow-y-auto space-y-6">
-                {/* Product Header Cards Row */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {compareList.map(p => (
-                    <div
-                      key={p.productId}
-                      className="relative lumina-card p-4 flex flex-col justify-between space-y-3 bg-stone-50 dark:bg-stone-800/50 border border-stone-200/80 dark:border-stone-800"
-                    >
-                      <button
-                        onClick={() => removeFromCompare(p.productId)}
-                        className="absolute top-3 right-3 p-1 rounded-full bg-stone-200/80 dark:bg-stone-700/80 text-stone-500 hover:text-red-500 transition-colors"
-                        title="Remove product"
+              <div className="p-4 sm:p-6 overflow-y-auto overflow-x-auto space-y-6">
+                <div className="min-w-full space-y-6">
+                  {/* Product Header Cards Row */}
+                  <div
+                    className="grid gap-3 sm:gap-4"
+                    style={{ gridTemplateColumns: `repeat(${compareList.length}, minmax(210px, 1fr))` }}
+                  >
+                    {compareList.map(p => (
+                      <div
+                        key={p.productId}
+                        className="relative lumina-card p-4 flex flex-col justify-between space-y-3 bg-stone-50 dark:bg-stone-800/50 border border-stone-200/80 dark:border-stone-800"
                       >
-                        <X size={14} />
-                      </button>
-
-                      <div className="aspect-square rounded-xl overflow-hidden bg-white dark:bg-stone-900 p-2 border border-stone-200/60 dark:border-stone-700">
-                        <img
-                          src={p.images && p.images[0] ? p.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&q=80'}
-                          alt={p.name}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                          {p.brand}
-                        </span>
-                        <h3 className="font-display font-bold text-xs text-stone-900 dark:text-white line-clamp-2">
-                          {p.name}
-                        </h3>
-                      </div>
-
-                      <div className="pt-2 border-t border-stone-200 dark:border-stone-700 space-y-2">
-                        <div className="font-display font-extrabold text-sm text-stone-900 dark:text-white">
-                          {formatPrice(p.sellingPrice)}
-                          {p.mrp > p.sellingPrice && (
-                            <span className="text-[10px] text-stone-400 line-through ml-1.5 font-normal">
-                              {formatPrice(p.mrp)}
-                            </span>
-                          )}
-                        </div>
-
-                        <Link
-                          to={`/products/${p.slug}`}
-                          onClick={() => setCompareOpen(false)}
-                          className="w-full lumina-btn text-[11px] py-1.5 flex items-center justify-center gap-1"
+                        <button
+                          onClick={() => removeFromCompare(p.productId)}
+                          className="absolute top-3 right-3 p-1 rounded-full bg-stone-200/80 dark:bg-stone-700/80 text-stone-500 hover:text-red-500 transition-colors"
+                          title="Remove product"
                         >
-                          <span>View Details</span>
-                          <ArrowRight size={12} />
-                        </Link>
+                          <X size={14} />
+                        </button>
+
+                        <div className="aspect-square rounded-xl overflow-hidden bg-white dark:bg-stone-900 p-2 border border-stone-200/60 dark:border-stone-700">
+                          <img
+                            src={p.images && p.images[0] ? p.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&q=80'}
+                            alt={p.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                            {p.brand}
+                          </span>
+                          <h3 className="font-display font-bold text-xs text-stone-900 dark:text-white line-clamp-2">
+                            {p.name}
+                          </h3>
+                        </div>
+
+                        <div className="pt-2 border-t border-stone-200 dark:border-stone-700 space-y-2">
+                          <div className="font-display font-extrabold text-sm text-stone-900 dark:text-white">
+                            {formatPrice(p.sellingPrice)}
+                            {p.mrp > p.sellingPrice && (
+                              <span className="text-[10px] text-stone-400 line-through ml-1.5 font-normal">
+                                {formatPrice(p.mrp)}
+                              </span>
+                            )}
+                          </div>
+
+                          <Link
+                            to={`/products/${p.slug}`}
+                            onClick={() => setCompareOpen(false)}
+                            className="w-full lumina-btn text-[11px] py-1.5 flex items-center justify-center gap-1"
+                          >
+                            <span>View Details</span>
+                            <ArrowRight size={12} />
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Detailed Comparison Matrix */}
-                <div className="space-y-4 pt-4 border-t border-stone-200 dark:border-stone-800">
-                  <h4 className="font-display font-bold text-xs uppercase tracking-widest text-stone-400">
-                    Detailed Comparison
-                  </h4>
-
-                  {/* Category */}
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-stone-900 dark:text-white">Category</p>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-                      {compareList.map(p => (
-                        <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/40 font-medium text-stone-700 dark:text-stone-300">
-                          {p.category} {p.subcategory ? `(${p.subcategory})` : ''}
-                        </div>
-                      ))}
-                    </div>
+                    ))}
                   </div>
 
-                  {/* Key Features */}
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-stone-900 dark:text-white">Key Features</p>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-                      {compareList.map(p => (
-                        <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/40 text-stone-700 dark:text-stone-300 space-y-1">
-                          {p.features && p.features.length > 0 ? (
-                            p.features.map((feat, idx) => (
-                              <div key={idx} className="flex items-start gap-1.5 text-[11px]">
-                                <Check size={12} className="text-emerald-500 shrink-0 mt-0.5" />
-                                <span>{feat}</span>
-                              </div>
-                            ))
-                          ) : (
-                            <span className="text-stone-400 italic">No features listed</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Detailed Comparison Matrix */}
+                  <div className="space-y-4 pt-4 border-t border-stone-200 dark:border-stone-800">
+                    <h4 className="font-display font-bold text-xs uppercase tracking-widest text-stone-400">
+                      Detailed Comparison
+                    </h4>
 
-                  {/* Dynamic Technical Specifications */}
-                  {allSpecKeys.map(specKey => (
-                    <div key={specKey} className="space-y-1">
-                      <p className="text-xs font-bold text-stone-900 dark:text-white">{specKey}</p>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                    {/* Category */}
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-stone-900 dark:text-white">Category</p>
+                      <div
+                        className="grid gap-3 sm:gap-4 text-xs"
+                        style={{ gridTemplateColumns: `repeat(${compareList.length}, minmax(210px, 1fr))` }}
+                      >
                         {compareList.map(p => (
-                          <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/40 font-medium text-stone-700 dark:text-stone-300 text-[11px]">
-                            {p.specifications && p.specifications[specKey] ? p.specifications[specKey] : '—'}
+                          <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/40 font-medium text-stone-700 dark:text-stone-300">
+                            {p.category} {p.subcategory ? `(${p.subcategory})` : ''}
                           </div>
                         ))}
                       </div>
                     </div>
-                  ))}
 
-                  {/* Warranty & Services */}
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-stone-900 dark:text-white">Warranty</p>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
-                      {compareList.map(p => (
-                        <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/40 text-stone-700 dark:text-stone-300 text-[11px]">
-                          {p.warranty || 'Standard Manufacturer Warranty'}
+                    {/* Key Features */}
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-stone-900 dark:text-white">Key Features</p>
+                      <div
+                        className="grid gap-3 sm:gap-4 text-xs"
+                        style={{ gridTemplateColumns: `repeat(${compareList.length}, minmax(210px, 1fr))` }}
+                      >
+                        {compareList.map(p => (
+                          <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/80 text-stone-800 dark:text-stone-100 space-y-1">
+                            {p.features && p.features.length > 0 ? (
+                              p.features.map((feat, idx) => (
+                                <div key={idx} className="flex items-start gap-1.5 text-[11px] text-stone-800 dark:text-white">
+                                  <Check size={12} className="text-emerald-500 shrink-0 mt-0.5" />
+                                  <span className="text-stone-800 dark:text-white font-medium">{feat}</span>
+                                </div>
+                              ))
+                            ) : (
+                              <span className="text-stone-400 italic">No features listed</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Dynamic Technical Specifications */}
+                    {allSpecKeys.map(specKey => (
+                      <div key={specKey} className="space-y-1">
+                        <p className="text-xs font-bold text-stone-900 dark:text-white">{specKey}</p>
+                        <div
+                          className="grid gap-3 sm:gap-4 text-xs"
+                          style={{ gridTemplateColumns: `repeat(${compareList.length}, minmax(210px, 1fr))` }}
+                        >
+                          {compareList.map(p => (
+                            <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/80 font-medium text-stone-800 dark:text-stone-100 text-[11px]">
+                              {p.specifications && p.specifications[specKey] ? p.specifications[specKey] : '—'}
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    ))}
+
+                    {/* Warranty & Services */}
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-stone-900 dark:text-white">Warranty</p>
+                      <div
+                        className="grid gap-3 sm:gap-4 text-xs"
+                        style={{ gridTemplateColumns: `repeat(${compareList.length}, minmax(210px, 1fr))` }}
+                      >
+                        {compareList.map(p => (
+                          <div key={p.productId} className="p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800/40 text-stone-700 dark:text-stone-300 text-[11px]">
+                            {p.warranty || 'Standard Manufacturer Warranty'}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
