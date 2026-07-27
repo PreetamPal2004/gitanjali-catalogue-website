@@ -123,8 +123,10 @@ export interface Brand {
   name: string;
   slug: string;
   logo: string;
+  brandLogo?: string;
   description: string;
   productCount: number;
+  active?: boolean;
 }
 
 // ===== Review =====

@@ -47,18 +47,7 @@ function ProductSkeletonGrid() {
   );
 }
 
-function CollectionSkeletonGrid() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="lumina-card aspect-[4/3] rounded-3xl bg-stone-200/80 dark:bg-stone-800/80 animate-pulse relative p-5 flex flex-col justify-end space-y-2">
-          <div className="w-1/2 h-5 bg-stone-300 dark:bg-stone-700 rounded-md" />
-          <div className="w-1/3 h-3 bg-stone-300 dark:bg-stone-700 rounded-md" />
-        </div>
-      ))}
-    </div>
-  );
-}
+
 
 export default function HomePage() {
   const { data, loading } = useCMS();
@@ -73,32 +62,17 @@ export default function HomePage() {
   const featuredProducts = products.filter(p => p.featured && p.active !== false);
   const heroProduct = featuredProducts[0] || products[0];
 
-  // Group featured products by brand to build Featured Brand Collections
-  const featuredBrandsMap = new Map<string, { brand: string; count: number; image: string }>();
-
-  featuredProducts.forEach(p => {
-    if (!p.brand) return;
-    const existing = featuredBrandsMap.get(p.brand);
-    
-    // Find brand logo from brandLogo column or brand sheet logo or fallback product image
-    const matchingBrandSheet = brandsSheet.find(b => b.name.toLowerCase() === p.brand.toLowerCase());
-    const brandLogo = p.brandLogo || matchingBrandSheet?.logo || (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&q=80';
-
-    if (existing) {
-      existing.count += 1;
-      if (!existing.image && brandLogo) {
-        existing.image = brandLogo;
-      }
-    } else {
-      featuredBrandsMap.set(p.brand, {
-        brand: p.brand,
-        count: 1,
-        image: brandLogo,
-      });
-    }
-  });
-
-  const featuredBrandCollections = Array.from(featuredBrandsMap.values());
+  // Strictly use ONLY the Brands sheet for companies, reading logo from "brandLogo" column
+  const allBrandsList = brandsSheet
+    .filter(b => b && b.name && String(b.name).trim() !== '' && b.active !== false && String(b.active).toUpperCase() !== 'FALSE')
+    .map(b => {
+      const brandName = String(b.name).trim();
+      const logoUrl = b.brandLogo || b.logo || (b as any)['brand_logo'] || (b as any)['Brand Logo'] || '';
+      return {
+        brand: brandName,
+        logo: String(logoUrl).trim(),
+      };
+    });
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-20">
@@ -160,7 +134,7 @@ export default function HomePage() {
 
       {/* ===== FEATURED PRODUCTS SHOWCASE (Strictly from Google Sheets) ===== */}
       <section className="space-y-6">
-        <div className="flex items-end justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-0">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 block mb-1">
               CURATED SELECTION
@@ -171,9 +145,9 @@ export default function HomePage() {
           </div>
           <Link
             to="/products"
-            className="text-xs font-semibold text-stone-900 dark:text-white hover:underline flex items-center gap-1"
+            className="self-start sm:self-auto text-xs font-bold text-white dark:text-stone-900 bg-stone-900 dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-100 px-4 py-2 rounded-full shadow-sm transition-all flex items-center gap-1.5"
           >
-            View Full Catalogue <ArrowRight size={13} />
+            <span>View Full Catalogue</span> <ArrowRight size={13} />
           </Link>
         </div>
 
@@ -251,7 +225,7 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ===== FEATURED COLLECTIONS (Grouped by Featured Brand from Products Sheet) ===== */}
+      {/* ===== FEATURED COLLECTIONS / BRANDS (White Strip Infinite Carousel) ===== */}
       <section className="space-y-6">
         <div className="flex items-end justify-between">
           <div>
@@ -262,46 +236,64 @@ export default function HomePage() {
               Top brands featuring highlighted products.
             </p>
           </div>
+          <Link
+            to="/brands"
+            className="text-xs font-semibold text-stone-900 dark:text-white hover:underline flex items-center gap-1"
+          >
+            View All Brands <ArrowRight size={13} />
+          </Link>
         </div>
 
         {loading ? (
-          <CollectionSkeletonGrid />
-        ) : featuredBrandCollections.length === 0 ? (
-          <div className="lumina-card p-10 text-center text-stone-400 text-xs">
-            No featured brand collections found. Mark products with <code className="bg-stone-200 dark:bg-stone-800 px-1.5 py-0.5 rounded font-mono">featured: TRUE</code> in your Products sheet.
+          <div className="bg-white dark:bg-stone-900 rounded-3xl p-6 border border-stone-200/80 dark:border-stone-800 animate-pulse h-28" />
+        ) : allBrandsList.length === 0 ? (
+          <div className="bg-white dark:bg-stone-900 rounded-3xl p-8 text-center text-stone-400 text-xs border border-stone-200/80 dark:border-stone-800">
+            No brands found.
           </div>
         ) : (
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            variants={stagger}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          >
-            {featuredBrandCollections.slice(0, 3).map(item => (
-              <motion.div key={item.brand} variants={fadeUp}>
-                <Link to={`/products?brand=${encodeURIComponent(item.brand)}&featured=true`}>
-                  <div className="relative rounded-3xl overflow-hidden aspect-[4/3] group lumina-card border border-white/60 dark:border-white/10 cursor-pointer">
-                    <img
-                      src={item.image}
-                      alt={item.brand}
-                      className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                    <div className="absolute bottom-5 left-5 right-5 text-white space-y-1">
-                      <span className="text-[9px] font-bold uppercase tracking-widest bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full">
-                        BRAND COLLECTION
+          /* White Strip Container */
+          <div className="relative rounded-3xl bg-white dark:bg-stone-900/90 border border-stone-200/80 dark:border-stone-800 shadow-md py-5 md:py-8 px-4 md:px-8 overflow-hidden">
+            {/* Fade edges */}
+            <div className="absolute left-0 top-0 bottom-0 w-14 md:w-24 bg-gradient-to-r from-white dark:from-stone-900 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-14 md:w-24 bg-gradient-to-l from-white dark:from-stone-900 to-transparent z-10 pointer-events-none" />
+
+            {/* Infinite Marquee Track */}
+            <div className="animate-brand-marquee flex items-center gap-12 md:gap-20">
+              {[...allBrandsList, ...allBrandsList, ...allBrandsList, ...allBrandsList].map((item, idx) => (
+                <Link
+                  key={`${item.brand}-${idx}`}
+                  to={`/products?brand=${encodeURIComponent(item.brand)}`}
+                  title={item.brand}
+                  className="flex items-center justify-center group/item shrink-0 cursor-pointer min-w-[80px] md:min-w-[140px]"
+                >
+                  {/* Clean Logo Image */}
+                  <div className="h-10 md:h-16 lg:h-20 w-full flex items-center justify-center px-1">
+                    {item.logo ? (
+                      <img
+                        src={item.logo}
+                        alt={item.brand}
+                        className="max-h-10 md:max-h-16 lg:max-h-20 max-w-[110px] md:max-w-[160px] lg:max-w-[200px] object-contain group-hover/item:scale-108 transition-transform duration-300 filter dark:brightness-110"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                          const parent = (e.target as HTMLElement).parentElement;
+                          if (parent && !parent.querySelector('.brand-logo-fallback')) {
+                            const fallback = document.createElement('span');
+                            fallback.className = 'brand-logo-fallback font-bold text-sm md:text-xl text-stone-400 dark:text-stone-500 uppercase tracking-wider';
+                            fallback.innerText = item.brand.charAt(0).toUpperCase();
+                            parent.appendChild(fallback);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <span className="font-bold text-sm md:text-xl text-stone-400 dark:text-stone-500 uppercase tracking-wider">
+                        {item.brand.charAt(0).toUpperCase()}
                       </span>
-                      <h3 className="font-display font-bold text-xl">{item.brand}</h3>
-                      <p className="text-xs text-stone-300 font-light">
-                        {item.count} Featured Item{item.count > 1 ? 's' : ''}
-                      </p>
-                    </div>
+                    )}
                   </div>
                 </Link>
-              </motion.div>
-            ))}
-          </motion.div>
+              ))}
+            </div>
+          </div>
         )}
       </section>
 
