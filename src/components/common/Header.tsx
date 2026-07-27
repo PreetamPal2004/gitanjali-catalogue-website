@@ -31,8 +31,17 @@ export default function Header() {
 
   // Lock background scroll when menu is open
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
   }, [open]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -44,7 +53,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/30 dark:bg-stone-900/30 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/40 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.05)] transition-colors">
+      <header className="sticky top-0 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 shadow-sm transition-colors">
         <div className="max-w-7xl mx-auto px-6 py-2.5">
           {/* Top Row: Logo, Nav, Actions */}
           <div className="flex items-center justify-between gap-4 h-12">
@@ -154,18 +163,18 @@ export default function Header() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black/50 z-[60] lg:hidden"
+              className="fixed inset-0 bg-black/60 z-[60] touch-none lg:hidden"
             />
 
             {/* Centered Menu Card */}
             <motion.nav
-              initial={{ opacity: 0, scale: 0.92, y: -10 }}
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: -10 }}
-              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
               className="fixed inset-x-4 top-20 z-[70] lg:hidden
-                bg-white/30 dark:bg-stone-900/30 backdrop-blur-2xl backdrop-saturate-150
-                border border-white/40 dark:border-white/10
+                bg-white dark:bg-stone-900
+                border border-stone-200 dark:border-stone-800
                 rounded-2xl shadow-2xl
                 p-5 overflow-hidden"
             >

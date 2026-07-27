@@ -13,7 +13,7 @@ export default function StickyMobileBar() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/30 dark:bg-stone-900/30 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/40 dark:border-white/10 rounded-t-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)]">
+    <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200/80 dark:border-stone-800 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
       <div className="flex items-center justify-around py-2 px-1">
         {actions.map(a => (
           <a
