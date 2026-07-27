@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, Globe, Search, GitCompareArrows } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
@@ -19,7 +19,8 @@ const links = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const { theme, toggleTheme } = useTheme();
   const { t, toggleLanguage, language } = useLanguage();
   const { compareList, setCompareOpen } = useCompare();
@@ -28,6 +29,11 @@ export default function Header() {
 
   const isActive = (path: string) =>
     path === '/' ? loc.pathname === '/' : loc.pathname.startsWith(path);
+
+  // Sync search input with URL search param
+  useEffect(() => {
+    setSearchQuery(searchParams.get('search') || '');
+  }, [searchParams]);
 
   // Lock background scroll when menu is open
   useEffect(() => {
@@ -48,6 +54,13 @@ export default function Header() {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    if (loc.pathname === '/products') {
+      navigate('/products');
     }
   };
 
@@ -143,6 +156,17 @@ export default function Header() {
                     onChange={e => setSearchQuery(e.target.value)}
                     className="search-input"
                   />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="absolute right-11 md:right-13 z-10 p-1 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors rounded-full hover:bg-stone-200/50 dark:hover:bg-stone-700/50"
+                      title="Clear search"
+                      aria-label="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    </button>
+                  )}
                   <button type="submit" className="search-icon-btn" aria-label="Search">
                     <Search className="w-3.5 h-3.5 md:w-[16px] md:h-[16px]" />
                   </button>

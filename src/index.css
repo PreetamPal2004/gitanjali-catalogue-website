@@ -273,7 +273,7 @@ html.dark input::placeholder, html.dark textarea::placeholder,
 }
 
 .search-input {
-  padding: 8px 12px 8px 32px;
+  padding: 8px 65px 8px 32px;
   width: 100%;
   background: linear-gradient(135deg, #ede6dc 0%, #e8e0d6 100%);
   border: none;
@@ -286,7 +286,7 @@ html.dark input::placeholder, html.dark textarea::placeholder,
 @media (min-width: 768px) {
   .search-input {
     font-size: 15px;
-    padding: 10px 16px 10px 42px;
+    padding: 10px 75px 10px 42px;
   }
   .search-icon-btn {
     width: 38px;
