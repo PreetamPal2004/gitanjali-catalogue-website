@@ -396,6 +396,7 @@ export default function ProductsPage() {
                       <img
                         src={featuredLaunch.images[0]}
                         alt={featuredLaunch.name}
+                        loading="lazy"
                         className="w-full h-full object-contain drop-shadow-md rounded-xl"
                       />
                     </div>

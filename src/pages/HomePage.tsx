@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Star } from 'lucide-react';
@@ -48,6 +49,28 @@ function ProductSkeletonGrid() {
 }
 
 
+
+function BrandLogo({ logo, brand }: { logo: string; brand: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!logo || failed) {
+    return (
+      <span className="font-bold text-sm md:text-xl text-stone-400 dark:text-stone-500 uppercase tracking-wider">
+        {brand.charAt(0).toUpperCase()}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={logo}
+      alt={brand}
+      loading="lazy"
+      className="max-h-10 md:max-h-16 lg:max-h-20 max-w-[110px] md:max-w-[160px] lg:max-w-[200px] object-contain group-hover/item:scale-108 transition-transform duration-300 filter dark:brightness-110"
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 export default function HomePage() {
   const { data, loading } = useCMS();
@@ -113,8 +136,9 @@ export default function HomePage() {
               <Link to={`/products/${heroProduct.slug}`}>
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] group border border-white/60 dark:border-white/10 cursor-pointer">
                   <img
-                    src={heroProduct.images && heroProduct.images[0] ? heroProduct.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&q=80'}
+                    src={heroProduct.images && heroProduct.images[0] ? heroProduct.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=75'}
                     alt={heroProduct.name}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
@@ -174,8 +198,9 @@ export default function HomePage() {
                       <div className="space-y-3">
                         <div className="relative aspect-square rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800">
                           <img
-                            src={product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&q=80'}
+                            src={product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=75'}
                             alt={product.name}
+                            loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                           {discount > 0 && (
@@ -259,7 +284,7 @@ export default function HomePage() {
 
             {/* Infinite Marquee Track */}
             <div className="animate-brand-marquee flex items-center gap-12 md:gap-20">
-              {[...allBrandsList, ...allBrandsList, ...allBrandsList, ...allBrandsList].map((item, idx) => (
+              {[...allBrandsList, ...allBrandsList].map((item, idx) => (
                 <Link
                   key={`${item.brand}-${idx}`}
                   to={`/products?brand=${encodeURIComponent(item.brand)}`}
@@ -268,27 +293,7 @@ export default function HomePage() {
                 >
                   {/* Clean Logo Image */}
                   <div className="h-10 md:h-16 lg:h-20 w-full flex items-center justify-center px-1">
-                    {item.logo ? (
-                      <img
-                        src={item.logo}
-                        alt={item.brand}
-                        className="max-h-10 md:max-h-16 lg:max-h-20 max-w-[110px] md:max-w-[160px] lg:max-w-[200px] object-contain group-hover/item:scale-108 transition-transform duration-300 filter dark:brightness-110"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                          const parent = (e.target as HTMLElement).parentElement;
-                          if (parent && !parent.querySelector('.brand-logo-fallback')) {
-                            const fallback = document.createElement('span');
-                            fallback.className = 'brand-logo-fallback font-bold text-sm md:text-xl text-stone-400 dark:text-stone-500 uppercase tracking-wider';
-                            fallback.innerText = item.brand.charAt(0).toUpperCase();
-                            parent.appendChild(fallback);
-                          }
-                        }}
-                      />
-                    ) : (
-                      <span className="font-bold text-sm md:text-xl text-stone-400 dark:text-stone-500 uppercase tracking-wider">
-                        {item.brand.charAt(0).toUpperCase()}
-                      </span>
-                    )}
+                    <BrandLogo logo={item.logo} brand={item.brand} />
                   </div>
                 </Link>
               ))}

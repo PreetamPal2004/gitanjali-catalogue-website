@@ -4,8 +4,22 @@ import mockData from '../data/mockData';
 import { fetchCMSData } from '../services/cmsApi';
 
 const API_URL = import.meta.env.VITE_GSHEETS_API_URL || '';
+const CACHE_KEY = 'gitanjali_cms_cache_v1';
 
-const emptyData: CMSData = mockData;
+function getInitialData(): CMSData {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && Array.isArray(parsed.products) && parsed.products.length > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Fallback to default mockData on JSON error
+  }
+  return mockData;
+}
 
 interface CMSContextType {
   data: CMSData;
@@ -15,23 +29,45 @@ interface CMSContextType {
 }
 
 const CMSContext = createContext<CMSContextType>({
-  data: API_URL ? emptyData : mockData,
-  loading: !!API_URL,
+  data: getInitialData(),
+  loading: false,
   error: null,
   refresh: async () => {},
 });
 
 export function CMSProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<CMSData>(API_URL ? emptyData : mockData);
-  const [loading, setLoading] = useState(!!API_URL);
+  const [data, setData] = useState<CMSData>(getInitialData);
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (!API_URL) return false;
+    try {
+      return !localStorage.getItem(CACHE_KEY);
+    } catch {
+      return true;
+    }
+  });
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    setLoading(true);
+    let hasCached = false;
+    try {
+      hasCached = !!localStorage.getItem(CACHE_KEY);
+    } catch {
+      hasCached = false;
+    }
+
+    if (!hasCached) {
+      setLoading(true);
+    }
     setError(null);
+
     try {
       const fetched = await fetchCMSData();
       setData(fetched);
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(fetched));
+      } catch {
+        // Handle storage quota limits gracefully
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load CMS data');
     } finally {

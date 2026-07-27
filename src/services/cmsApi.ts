@@ -4,7 +4,7 @@ import mockData from '../data/mockData';
 // Public Google Apps Script Web App URL or proxy endpoint
 const API_URL = import.meta.env.VITE_GSHEETS_API_URL || '';
 
-const ELECTRONICS_SHOWROOM_IMAGE = 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=800&q=80';
+const ELECTRONICS_SHOWROOM_IMAGE = 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=600&auto=format&fit=crop&q=75';
 
 export async function fetchCMSData(): Promise<CMSData> {
   if (!API_URL) {
