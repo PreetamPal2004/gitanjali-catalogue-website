@@ -69,8 +69,15 @@ export async function fetchCMSData(): Promise<CMSData> {
           { type: 'maps', label: 'Directions', value: businessInfo.address, url: businessInfo.maps, icon: 'MapPin', active: true, order: 4 },
         ];
 
+    const sanitizedProducts = Array.isArray(raw.products)
+      ? raw.products.map((p: any) => ({
+          ...p,
+          warranty: String(p.warranty || p.Warranty || p.WARRANTY || p['Warranty Period'] || p['warranty_period'] || p.warrantyPeriod || '1 Year Manufacturer Warranty'),
+        }))
+      : [];
+
     return {
-      products: Array.isArray(raw.products) ? raw.products : [],
+      products: sanitizedProducts,
       categories: Array.isArray(raw.categories) ? raw.categories : [],
       offers: Array.isArray(raw.offers) ? raw.offers : [],
       brands: Array.isArray(raw.brands) ? raw.brands : [],

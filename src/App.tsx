@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
@@ -15,18 +15,6 @@ import ServicesPage from './pages/ServicesPage';
 import GalleryPage from './pages/GalleryPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  return isMobile;
-}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -64,10 +52,8 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
-  const isMobile = useIsMobile();
-
   return (
-    <MotionConfig reducedMotion={isMobile ? 'always' : 'never'}>
+    <MotionConfig reducedMotion="user">
       <BrowserRouter>
         <ThemeProvider>
           <LanguageProvider>

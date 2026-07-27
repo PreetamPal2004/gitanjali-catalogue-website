@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Phone, MessageCircle, Check, GitCompareArrows, Star, MessageSquare, Plus, X } from 'lucide-react';
+import { ArrowLeft, Phone, MessageCircle, Check, GitCompareArrows, Star, MessageSquare, Plus, X, ShieldCheck } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useCompare } from '../context/CompareContext';
 import { formatPrice, calcDiscount, whatsappLink } from '../utils/formatters';
@@ -173,7 +173,7 @@ export default function ProductDetailPage() {
               )}
             </div>
             <p className="text-[11px] text-stone-500 dark:text-stone-400">
-              Inclusive of all taxes • {product.warranty}
+              Inclusive of all taxes •
             </p>
           </div>
 
@@ -219,9 +219,49 @@ export default function ProductDetailPage() {
             </button>
           </div>
 
+          {/* Highlighted Warranty Banner */}
+          {product.warranty && (
+            <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border border-amber-500/30 dark:border-amber-400/30 rounded-2xl p-4 flex items-start sm:items-center gap-3.5 shadow-sm ">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                <ShieldCheck size={26} className="stroke-[2.2]" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-[20px] font-bold text-amber-600 dark:text-amber-400 pb-1">
+                  Warranty
+                </p>
+
+                {(() => {
+                  const points = product.warranty
+                    .split(',')
+                    .map(p => p.trim())
+                    .filter(Boolean);
+
+                  if (points.length <= 1) {
+                    return (
+                      <p className="text-[14px] font-normal text-stone-900 dark:text-stone-100 leading-snug">
+                        {product.warranty}
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <ul className="space-y-1.5 pt-0.5">
+                      {points.map((pt, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-[14px] font-normal text-stone-900 dark:text-stone-100 leading-snug">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
           {/* Key Specifications */}
           <div className="lumina-card p-5 space-y-3">
-            <h3 className="font-display font-bold text-xs uppercase tracking-wider text-stone-900 dark:text-white">
+            <h3 className="font-display font-bold text-s uppercase tracking-wide text-stone-900 dark:text-white pb-2">
               Key Specifications
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">

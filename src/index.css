@@ -392,27 +392,16 @@ html.dark input::placeholder, html.dark textarea::placeholder,
   animation-play-state: paused;
 }
 
-/* ===== Mobile View Animation Removal & Performance Optimization ===== */
+/* ===== Mobile View Subtle Animations & Performance Optimization ===== */
 @media (max-width: 768px) {
-  /* Disable CSS keyframe animations & heavy transitions on mobile */
-  *, ::before, ::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
-
-  /* Disable marquee continuous sliding on mobile */
+  /* Infinite Marquee Carousel enabled on mobile with hardware acceleration */
   .animate-brand-marquee {
-    animation: none !important;
+    animation: brandMarquee 20s linear infinite !important;
+    will-change: transform;
+    transform: translateZ(0);
   }
 
-  /* Disable skeleton pulses on mobile */
-  .animate-pulse {
-    animation: none !important;
-    opacity: 0.75;
-  }
-
-  /* Disable heavy backdrop blurs on mobile GPU */
+  /* Keep heavy backdrop blurs disabled on mobile GPU for smooth 60fps rendering */
   .backdrop-blur-md,
   .backdrop-blur-xl,
   .backdrop-blur-2xl,

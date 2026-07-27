@@ -87,12 +87,11 @@ export default function ProductsPage() {
   // Featured launch product (first active product or highlighted item)
   const featuredLaunch = data.products.find(p => p.active) || data.products[0];
 
-  // Dynamically derive categories from active products in the Products sheet + Categories sheet
+  // Strictly derive categories ONLY from the 'category' column of active products in the Products sheet
   const categories = useMemo(() => {
     const catMap = new Map<string, { name: string; slug: string; count: number }>();
     const activeProducts = data.products.filter(p => p.active !== false);
 
-    // 1. Extract categories directly from the products sheet
     for (const p of activeProducts) {
       const rawCat = (p.category || '').trim();
       if (!rawCat) continue;
@@ -109,27 +108,8 @@ export default function ProductsPage() {
       }
     }
 
-    // 2. Add categories from Categories sheet if not already present
-    if (Array.isArray(data.categories)) {
-      for (const c of data.categories) {
-        if (!c || !c.name) continue;
-        const rawCat = String(c.name).trim();
-        if (!rawCat) continue;
-        const lowerKey = rawCat.toLowerCase();
-
-        if (!catMap.has(lowerKey)) {
-          const count = activeProducts.filter(p => (p.category || '').trim().toLowerCase() === lowerKey).length;
-          catMap.set(lowerKey, {
-            name: rawCat,
-            slug: c.slug || rawCat.toLowerCase().replace(/\s+/g, '-'),
-            count,
-          });
-        }
-      }
-    }
-
     return Array.from(catMap.values());
-  }, [data.products, data.categories]);
+  }, [data.products]);
 
   const activeTotalCount = useMemo(() => {
     return data.products.filter(p => p.active !== false).length;
