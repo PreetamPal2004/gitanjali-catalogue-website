@@ -38,7 +38,7 @@ function ProductCardSkeleton() {
 
 function FeaturedLaunchSkeleton() {
   return (
-    <div className="lumina-card p-6 md:p-8 overflow-hidden animate-pulse border border-stone-200/60 dark:border-stone-800/60 space-y-4">
+    <div className="hidden md:block lumina-card p-6 md:p-8 overflow-hidden animate-pulse border border-stone-200/60 dark:border-stone-800/60 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
         <div className="md:col-span-7 space-y-3">
           <div className="w-24 h-4 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
@@ -362,7 +362,7 @@ export default function ProductsPage() {
                 initial="hidden"
                 animate="visible"
                 variants={fadeUp}
-                className="lumina-card p-6 md:p-8 overflow-hidden relative"
+                className="hidden md:block lumina-card p-6 md:p-8 overflow-hidden relative"
               >
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                   <div className="md:col-span-7 space-y-4">
