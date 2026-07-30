@@ -288,29 +288,29 @@ export default function HomePage() {
         </div>
 
         {loading ? (
-          <div className="bg-white dark:bg-stone-900 rounded-3xl p-6 border border-stone-200/80 dark:border-stone-800 animate-pulse h-28" />
+          <div className="bg-transparent p-6 animate-pulse h-24" />
         ) : allBrandsList.length === 0 ? (
-          <div className="bg-white dark:bg-stone-900 rounded-3xl p-8 text-center text-stone-400 text-xs border border-stone-200/80 dark:border-stone-800">
+          <div className="bg-transparent p-8 text-center text-stone-400 text-xs">
             No brands found.
           </div>
         ) : (
-          /* White Strip Container */
-          <div className="relative rounded-3xl bg-white dark:bg-stone-900/90 border border-stone-200/80 dark:border-stone-800 shadow-md py-5 md:py-8 px-4 md:px-8 overflow-hidden">
-            {/* Fade edges */}
-            <div className="absolute left-0 top-0 bottom-0 w-14 md:w-24 bg-gradient-to-r from-white dark:from-stone-900 to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-14 md:w-24 bg-gradient-to-l from-white dark:from-stone-900 to-transparent z-10 pointer-events-none" />
+          /* Seamless Blended Marquee Container */
+          <div className="relative bg-transparent py-4 md:py-6 overflow-hidden">
+            {/* Fade edges matching page background */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 md:w-28 bg-gradient-to-r from-[#f4efe9] dark:from-[#12110f] to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-28 bg-gradient-to-l from-[#f4efe9] dark:from-[#12110f] to-transparent z-10 pointer-events-none" />
 
             {/* Infinite Marquee Track */}
-            <div className="animate-brand-marquee flex items-center gap-12 md:gap-20">
+            <div className="animate-brand-marquee flex items-center gap-10 md:gap-16">
               {[...allBrandsList, ...allBrandsList].map((item, idx) => (
                 <Link
                   key={`${item.brand}-${idx}`}
                   to={`/products?brand=${encodeURIComponent(item.brand)}`}
                   title={item.brand}
-                  className="flex items-center justify-center group/item shrink-0 cursor-pointer min-w-[80px] md:min-w-[140px]"
+                  className="flex items-center justify-center group/item shrink-0 cursor-pointer min-w-[90px] md:min-w-[150px]"
                 >
                   {/* Clean Logo Image */}
-                  <div className="h-10 md:h-16 lg:h-20 w-full flex items-center justify-center px-1">
+                  <div className="h-12 md:h-16 lg:h-20 w-full flex items-center justify-center px-2">
                     <BrandLogo logo={item.logo} brand={item.brand} />
                   </div>
                 </Link>

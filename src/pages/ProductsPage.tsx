@@ -16,25 +16,7 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.05 } }
 };
 
-function ProductCardSkeleton() {
-  return (
-    <div className="bg-white/30 dark:bg-stone-900/30 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-3xl p-4 space-y-3 animate-pulse">
-      <div className="aspect-square rounded-2xl bg-stone-200/80 dark:bg-stone-800/80" />
-      <div className="space-y-2 pt-1">
-        <div className="flex justify-between items-center">
-          <div className="w-16 h-3 bg-stone-200/80 dark:bg-stone-800/80 rounded-full" />
-          <div className="w-14 h-4 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
-        </div>
-        <div className="w-3/4 h-4 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
-        <div className="w-full h-3 bg-stone-200/80 dark:bg-stone-800/80 rounded-md" />
-      </div>
-      <div className="pt-3 border-t border-stone-200/50 dark:border-stone-800/50 flex justify-between items-center">
-        <div className="w-12 h-3 bg-stone-200/80 dark:bg-stone-800/80 rounded-full" />
-        <div className="w-14 h-3 bg-stone-200/80 dark:bg-stone-800/80 rounded-full" />
-      </div>
-    </div>
-  );
-}
+
 
 function FeaturedLaunchSkeleton() {
   return (
@@ -176,15 +158,15 @@ export default function ProductsPage() {
 
             </div>
 
-            {/* In-Place Height Expandable Drawer */}
+            {/* In-Place Expandable Drawer */}
             <AnimatePresence initial={false}>
               {showMobileFilters && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="overflow-hidden"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="overflow-hidden transform-gpu"
                 >
                   <div className="lumina-card p-5 space-y-5 bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 rounded-2xl shadow-md">
                     {/* Categories */}
@@ -486,13 +468,11 @@ export default function ProductsPage() {
 
           {/* Product Grid / List */}
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <ProductCardSkeleton key={i} />
-              ))}
+            <div className="lumina-card p-16 flex items-center justify-center shadow-sm">
+              <div className="loader" />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="lumina-card p-12 text-center text-stone-400 text-xs">
+            <div className="lumina-card p-12 text-center text-stone-400 text-xs font-medium">
               No products found matching your filter criteria.
             </div>
           ) : (

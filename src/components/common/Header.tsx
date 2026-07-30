@@ -66,7 +66,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 shadow-sm transition-colors">
+      <header className="sticky top-0 z-50 bg-white dark:bg-stone-900 md:bg-white/95 md:dark:bg-stone-900/95 md:backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 shadow-sm transition-colors">
         <div className="max-w-7xl mx-auto px-6 py-2.5 md:py-3.5">
           {/* Top Row: Logo, Nav, Actions */}
           <div className="flex items-center justify-between gap-4 h-12 md:h-14">

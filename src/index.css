@@ -394,20 +394,101 @@ html.dark input::placeholder, html.dark textarea::placeholder,
 
 /* ===== Mobile View Subtle Animations & Performance Optimization ===== */
 @media (max-width: 768px) {
-  /* Infinite Marquee Carousel enabled on mobile with hardware acceleration */
-  .animate-brand-marquee {
-    animation: brandMarquee 20s linear infinite !important;
-    will-change: transform;
-    transform: translateZ(0);
-  }
-
-  /* Keep heavy backdrop blurs disabled on mobile GPU for smooth 60fps rendering */
+  /* Disable heavy backdrop blurs on mobile screens (<= 768px) for rock-solid 60fps scrolling */
+  .backdrop-blur-xs,
+  .backdrop-blur-sm,
   .backdrop-blur-md,
+  .backdrop-blur-lg,
   .backdrop-blur-xl,
   .backdrop-blur-2xl,
-  .backdrop-blur-sm,
-  .lumina-card {
+  .backdrop-blur-3xl,
+  [class*="backdrop-blur"],
+  .lumina-card,
+  .lumina-card-subtle,
+  .lumina-header {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
+
+  /* Provide solid opaque fallbacks for mobile cards */
+  .lumina-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 16px !important;
+  }
+
+  .dark .lumina-card, html.dark .lumina-card {
+    background: #1a1714 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .lumina-header {
+    background: #f4efe9 !important;
+  }
+
+  .dark .lumina-header, html.dark .lumina-header {
+    background: #12110f !important;
+  }
+
+  /* Replace GPU-intensive deep box shadows on mobile with ultra-light border shadows */
+  .shadow-2xl,
+  .shadow-xl,
+  .shadow-lg,
+  .shadow-md {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .dark .shadow-2xl,
+  .dark .shadow-xl,
+  .dark .shadow-lg,
+  .dark .shadow-md {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  /* GPU accelerate continuous infinite carousel */
+  .animate-brand-marquee {
+    animation: brandMarquee 25s linear infinite !important;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Optimize touch scrolling performance & hardware composite cards */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lumina-card, img {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
 }
+
+/* ===== Custom Dot Loader ===== */
+.loader {
+  width: 60px;
+  aspect-ratio: 2;
+  --_g: no-repeat radial-gradient(circle closest-side, #1a1816 90%, #0000);
+  background: 
+    var(--_g) 0%   50%,
+    var(--_g) 50%  50%,
+    var(--_g) 100% 50%;
+  background-size: calc(100%/3) 50%;
+  animation: l3 1s infinite linear;
+}
+
+.dark .loader, html.dark .loader {
+  --_g: no-repeat radial-gradient(circle closest-side, #ffffff 90%, #0000);
+}
+
+@keyframes l3 {
+    20%{background-position:0%   0%, 50%  50%,100%  50%}
+    40%{background-position:0% 100%, 50%   0%,100%  50%}
+    60%{background-position:0%  50%, 50% 100%,100%   0%}
+    80%{background-position:0%  50%, 50%  50%,100% 100%}
+}
+
+

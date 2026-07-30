@@ -38,24 +38,12 @@ const CMSContext = createContext<CMSContextType>({
 export function CMSProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<CMSData>(getInitialData);
   const [loading, setLoading] = useState<boolean>(() => {
-    if (!API_URL) return false;
-    try {
-      return !localStorage.getItem(CACHE_KEY);
-    } catch {
-      return true;
-    }
+    return !!API_URL;
   });
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    let hasCached = false;
-    try {
-      hasCached = !!localStorage.getItem(CACHE_KEY);
-    } catch {
-      hasCached = false;
-    }
-
-    if (!hasCached) {
+    if (API_URL) {
       setLoading(true);
     }
     setError(null);
