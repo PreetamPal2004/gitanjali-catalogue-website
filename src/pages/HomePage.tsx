@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Star } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useLanguage } from '../context/LanguageContext';
-import { formatPrice, calcDiscount } from '../utils/formatters';
+import { formatPrice, calcDiscount, getFirstImage } from '../utils/formatters';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -137,13 +137,13 @@ export default function HomePage() {
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] group border border-white/60 dark:border-white/10 cursor-pointer">
                   {/* Top Right Corner Discount Badge */}
                   {heroProduct.mrp > heroProduct.sellingPrice && (
-                    <div className="absolute top-3 right-3 bg-amber-500 text-stone-950 font-extrabold text-[11px] sm:text-xs uppercase px-2.5 py-1 rounded-full shadow-lg border border-amber-300/40 z-10">
+                    <div className="absolute top-3 right-3 bg-emerald-600 text-white font-extrabold text-xs uppercase px-3.5 py-1.5 rounded-full shadow-lg border border-emerald-400/30 z-10 tracking-wider">
                       {calcDiscount(heroProduct.mrp, heroProduct.sellingPrice)}% OFF
                     </div>
                   )}
 
                   <img
-                    src={heroProduct.images && heroProduct.images[0] ? heroProduct.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=75'}
+                    src={getFirstImage(heroProduct.images)}
                     alt={heroProduct.name}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -209,13 +209,13 @@ export default function HomePage() {
                       <div className="space-y-3">
                         <div className="relative aspect-square rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800">
                           <img
-                            src={product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=75'}
+                            src={getFirstImage(product.images)}
                             alt={product.name}
                             loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                           {discount > 0 && (
-                            <span className="absolute top-3 left-3 bg-black text-white dark:bg-white dark:text-stone-900 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
                               {discount}% OFF
                             </span>
                           )}

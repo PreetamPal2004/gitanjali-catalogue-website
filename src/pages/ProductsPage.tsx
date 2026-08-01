@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Grid3X3, List, ArrowRight, Plus, Check, Star, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
+import { Grid3X3, List, ArrowRight, Plus, Check, Star, SlidersHorizontal, ChevronDown, X, ArrowUpDown } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useCompare } from '../context/CompareContext';
-import { formatPrice, calcDiscount } from '../utils/formatters';
+import { formatPrice, calcDiscount, getFirstImage } from '../utils/formatters';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -33,6 +33,91 @@ function FeaturedLaunchSkeleton() {
   );
 }
 
+interface SortDropdownProps {
+  value: 'low-to-high' | 'high-to-low';
+  onChange: (val: 'low-to-high' | 'high-to-low') => void;
+  fullWidth?: boolean;
+}
+
+function SortDropdown({ value, onChange, fullWidth = false }: SortDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const options: { id: 'low-to-high' | 'high-to-low'; label: string }[] = [
+    { id: 'low-to-high', label: 'Price: Low to High' },
+    { id: 'high-to-low', label: 'Price: High to Low' }
+  ];
+
+  const currentOption = options.find(o => o.id === value) || options[0];
+
+  return (
+    <div ref={dropdownRef} className={`relative inline-block ${fullWidth ? 'w-full' : ''}`}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(prev => !prev)}
+        className={`group flex items-center justify-between gap-2 bg-stone-200/60 dark:bg-stone-800/60 hover:bg-stone-300/80 dark:hover:bg-stone-700 text-stone-900 dark:text-white px-3.5 py-2 rounded-full text-xs font-semibold border border-stone-300/60 dark:border-stone-700/60 shadow-2xs hover:border-amber-500/50 transition-all duration-200 active:scale-98 cursor-pointer ${
+          fullWidth ? 'w-full' : ''
+        }`}
+      >
+        <div className="flex items-center gap-2 truncate">
+          <ArrowUpDown size={13} className="text-amber-600 dark:text-amber-400 shrink-0 group-hover:scale-110 transition-transform duration-200" />
+          <span className="truncate">{currentOption.label}</span>
+        </div>
+        <ChevronDown
+          size={14}
+          className={`text-stone-500 dark:text-stone-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-amber-500' : ''}`}
+        />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.95 }}
+            animate={{ opacity: 1, y: 6, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.95 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            className={`absolute left-0 z-50 min-w-[190px] bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border border-stone-200/90 dark:border-stone-800 rounded-2xl p-1.5 shadow-xl space-y-1 ${
+              fullWidth ? 'w-full' : 'right-0 sm:right-auto'
+            }`}
+          >
+            {options.map((opt) => {
+              const isSelected = value === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.id);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 cursor-pointer ${
+                    isSelected
+                      ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold'
+                      : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/80 hover:text-stone-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {isSelected && <Check size={14} className="text-amber-500 shrink-0 ml-2" />}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function ProductsPage() {
   const navigate = useNavigate();
   const { data, loading } = useCMS();
@@ -49,6 +134,7 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
   const [selectedBrand, setSelectedBrand] = useState(brandFromUrl);
   const [featuredOnly, setFeaturedOnly] = useState(featuredFromUrl);
+  const [sortBy, setSortBy] = useState<'low-to-high' | 'high-to-low'>('low-to-high');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -127,8 +213,15 @@ export default function ProductsPage() {
       items = items.filter(p => p.featured);
     }
 
-    return items;
-  }, [data.products, searchFromUrl, selectedCategory, selectedBrand, featuredOnly]);
+    return [...items].sort((a, b) => {
+      const priceA = Number(a.sellingPrice) || 0;
+      const priceB = Number(b.sellingPrice) || 0;
+      if (sortBy === 'high-to-low') {
+        return priceB - priceA;
+      }
+      return priceA - priceB;
+    });
+  }, [data.products, searchFromUrl, selectedCategory, selectedBrand, featuredOnly, sortBy]);
 
   const brands = [...new Set(data.products.filter(p => p.active !== false).map(p => p.brand))];
 
@@ -147,7 +240,7 @@ export default function ProductsPage() {
               >
                 <SlidersHorizontal size={14} className="text-amber-500" />
                 <span>{showMobileFilters ? 'Hide Filters' : 'Filters'}</span>
-                {(selectedCategory || selectedBrand || featuredOnly) && (
+                {(selectedCategory || selectedBrand || featuredOnly || sortBy !== 'low-to-high') && (
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse ml-0.5" />
                 )}
                 <ChevronDown
@@ -216,6 +309,12 @@ export default function ProductsPage() {
                         Filters
                       </h3>
 
+                      {/* Sort By Filter */}
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">Sort By</p>
+                        <SortDropdown value={sortBy} onChange={setSortBy} fullWidth />
+                      </div>
+
                       {/* Featured Filter */}
                       <div className="space-y-2">
                         <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">Product Highlights</p>
@@ -253,9 +352,9 @@ export default function ProductsPage() {
                         </div>
                       </div>
 
-                      {(selectedCategory || selectedBrand || featuredOnly) && (
+                      {(selectedCategory || selectedBrand || featuredOnly || sortBy !== 'low-to-high') && (
                         <button
-                          onClick={() => { setSelectedCategory(''); setSelectedBrand(''); setFeaturedOnly(false); }}
+                          onClick={() => { setSelectedCategory(''); setSelectedBrand(''); setFeaturedOnly(false); setSortBy('low-to-high'); }}
                           className="text-xs text-red-500 font-medium hover:underline pt-1 block"
                         >
                           Clear All Filters
@@ -315,6 +414,12 @@ export default function ProductsPage() {
                   Filters
                 </h3>
 
+                {/* Sort By Filter */}
+                <div className="space-y-2">
+                  <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">Sort By</p>
+                  <SortDropdown value={sortBy} onChange={setSortBy} fullWidth />
+                </div>
+
                 {/* Featured Filter */}
                 <div className="space-y-2">
                   <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">Product Highlights</p>
@@ -352,9 +457,9 @@ export default function ProductsPage() {
                   </div>
                 </div>
 
-                {(selectedCategory || selectedBrand || featuredOnly) && (
+                {(selectedCategory || selectedBrand || featuredOnly || sortBy !== 'low-to-high') && (
                   <button
-                    onClick={() => { setSelectedCategory(''); setSelectedBrand(''); setFeaturedOnly(false); }}
+                    onClick={() => { setSelectedCategory(''); setSelectedBrand(''); setFeaturedOnly(false); setSortBy('low-to-high'); }}
                     className="text-xs text-red-500 font-medium hover:underline pt-1 block"
                   >
                     Clear All Filters
@@ -440,26 +545,34 @@ export default function ProductsPage() {
               )}
             </div>
 
-            <div className="flex items-center gap-1 bg-stone-200/50 dark:bg-stone-800/50 p-1 rounded-full text-xs">
-              <button
-                onClick={() => setView('grid')}
-                className={`p-1.5 rounded-full transition-colors ${view === 'grid' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' : 'text-stone-400'}`}
-              >
-                <Grid3X3 size={14} />
-              </button>
-              <button
-                onClick={() => setView('list')}
-                className={`p-1.5 rounded-full transition-colors ${view === 'list' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' : 'text-stone-400'}`}
-              >
-                <List size={14} />
-              </button>
+            <div className="flex items-center justify-between sm:justify-start gap-2.5 w-full sm:w-auto">
+              {/* Sort By Dropdown */}
+              <SortDropdown value={sortBy} onChange={setSortBy} />
+
+              {/* View Switcher (Rightmost on Mobile) */}
+              <div className="flex items-center gap-1 bg-stone-200/50 dark:bg-stone-800/50 p-1 rounded-full text-xs border border-stone-200/60 dark:border-stone-700/60 ml-auto sm:ml-0">
+                <button
+                  onClick={() => setView('grid')}
+                  className={`p-1.5 rounded-full transition-colors ${view === 'grid' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' : 'text-stone-400'}`}
+                  title="Grid View"
+                >
+                  <Grid3X3 size={14} />
+                </button>
+                <button
+                  onClick={() => setView('list')}
+                  className={`p-1.5 rounded-full transition-colors ${view === 'list' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' : 'text-stone-400'}`}
+                  title="List View"
+                >
+                  <List size={14} />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Mobile-only Clear Filters Button */}
-          {(selectedCategory || selectedBrand || featuredOnly) && (
+          {(selectedCategory || selectedBrand || featuredOnly || sortBy !== 'low-to-high') && (
             <button
-              onClick={() => { setSelectedCategory(''); setSelectedBrand(''); setFeaturedOnly(false); }}
+              onClick={() => { setSelectedCategory(''); setSelectedBrand(''); setFeaturedOnly(false); setSortBy('low-to-high'); }}
               className="lg:hidden px-4 py-2 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-full transition-colors shadow-sm active:scale-95"
             >
               ✕ Clear All Filters
@@ -490,7 +603,7 @@ export default function ProductsPage() {
                         {/* Product Image */}
                         <div className="aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-white/40 dark:bg-stone-800/40 border border-white/30 dark:border-stone-700/30 mb-2.5 relative">
                           <img
-                            src={p.images[0]}
+                            src={getFirstImage(p.images)}
                             alt={p.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"

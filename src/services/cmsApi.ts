@@ -72,8 +72,29 @@ export async function fetchCMSData(): Promise<CMSData> {
     const sanitizedProducts = Array.isArray(raw.products)
       ? raw.products.map((p: any) => {
           const rawBrandLogo = p.brandLogo || p.brand_logo || p.BrandLogo || p['Brand Logo'] || p['brand logo'] || p.logo || p.Logo || '';
+          
+          let rawImages = p.images || p.Images || p.image || p.Image || p.pictureLink || p.picture_link || p.picturelink || p.photo || p.photos || p['Image Link'] || p['Image Links'] || '';
+          let imagesList: string[] = [];
+
+          if (Array.isArray(rawImages)) {
+            imagesList = rawImages
+              .flatMap((img: any) => (typeof img === 'string' ? img.split(',') : String(img)))
+              .map((s: string) => s.trim())
+              .filter(Boolean);
+          } else if (typeof rawImages === 'string' && rawImages.trim()) {
+            imagesList = rawImages
+              .split(',')
+              .map((s: string) => s.trim())
+              .filter(Boolean);
+          }
+
+          if (imagesList.length === 0) {
+            imagesList = [ELECTRONICS_SHOWROOM_IMAGE];
+          }
+
           return {
             ...p,
+            images: imagesList,
             brandLogo: rawBrandLogo ? String(rawBrandLogo).trim() : '',
             warranty: String(p.warranty || p.Warranty || p.WARRANTY || p['Warranty Period'] || p['warranty_period'] || p.warrantyPeriod || '1 Year Manufacturer Warranty'),
           };

@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Phone, MessageCircle, Check, GitCompareArrows, Star, MessageSquare, Plus, X, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Phone, MessageCircle, Check, GitCompareArrows, Star, MessageSquare, Plus, X, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useCompare } from '../context/CompareContext';
-import { formatPrice, calcDiscount, whatsappLink } from '../utils/formatters';
+import { formatPrice, calcDiscount, whatsappLink, getFirstImage, getAllImages } from '../utils/formatters';
 import type { Review } from '../types';
 
 const fadeUp = {
@@ -34,8 +34,11 @@ export default function ProductDetailPage() {
   const { data, loading } = useCMS();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
 
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    setSelectedImageIndex(0);
   }, [slug]);
 
   const [localReviews, setLocalReviews] = useState<Review[]>([]);
@@ -46,6 +49,10 @@ export default function ProductDetailPage() {
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
 
   const product = data.products.find(p => p.slug === slug);
+
+  const productImages = useMemo(() => {
+    return getAllImages(product?.images);
+  }, [product]);
 
   // Link product-specific reviews from GSheets reviews sheet by productId (e.g. P001) or slug
   const productReviews = useMemo(() => {
@@ -127,18 +134,82 @@ export default function ProductDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Left column - Images */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp} className="lg:col-span-6 space-y-4">
-          <div className="lumina-card aspect-[4/3] rounded-3xl overflow-hidden relative border border-white/60 dark:border-white/10 p-4">
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full h-full object-contain"
-            />
-            {product.discount > 0 && (
-              <span className="absolute top-4 left-4 bg-amber-500 text-stone-950 font-extrabold text-[10px] uppercase px-2.5 py-1 rounded-full shadow-md">
+          <div className="lumina-card aspect-[4/3] rounded-3xl overflow-hidden relative border border-white/60 dark:border-white/10 p-4 group flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={selectedImageIndex}
+                src={productImages[selectedImageIndex] || productImages[0]}
+                alt={`${product.name} - View ${selectedImageIndex + 1}`}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.2 }}
+                className="w-full h-full object-contain"
+              />
+            </AnimatePresence>
+
+            {product.mrp > product.sellingPrice && (
+              <span className="absolute top-4 left-4 bg-emerald-600 text-white font-extrabold text-xs uppercase px-3.5 py-1.5 rounded-full shadow-md z-10 tracking-wider">
                 {calcDiscount(product.mrp, product.sellingPrice)}% OFF
               </span>
             )}
+
+            {productImages.length > 1 && (
+              <>
+                <div className="absolute bottom-4 right-4 bg-black/60 dark:bg-stone-900/60 backdrop-blur-md text-white font-mono text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/20 z-10">
+                  {selectedImageIndex + 1} / {productImages.length}
+                </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImageIndex(prev => (prev === 0 ? productImages.length - 1 : prev - 1));
+                  }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 dark:bg-stone-900/80 backdrop-blur-md text-stone-900 dark:text-white flex items-center justify-center shadow-md hover:bg-white dark:hover:bg-stone-900 transition-all sm:opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
+                  title="Previous image"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImageIndex(prev => (prev === productImages.length - 1 ? 0 : prev + 1));
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 dark:bg-stone-900/80 backdrop-blur-md text-stone-900 dark:text-white flex items-center justify-center shadow-md hover:bg-white dark:hover:bg-stone-900 transition-all sm:opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
+                  title="Next image"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </>
+            )}
           </div>
+
+          {/* Thumbnails list */}
+          {productImages.length > 1 && (
+            <div className="flex items-center gap-2.5 overflow-x-auto p-1 scrollbar-none">
+              {productImages.map((imgUrl, idx) => {
+                const isActive = idx === selectedImageIndex;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImageIndex(idx)}
+                    className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 border-2 transition-all p-1 bg-white dark:bg-stone-900 cursor-pointer ${
+                      isActive
+                        ? 'border-amber-500 ring-2 ring-amber-500/30 scale-105 shadow-md'
+                        : 'border-stone-200 dark:border-stone-800 opacity-70 hover:opacity-100 hover:border-stone-300 dark:hover:border-stone-700'
+                    }`}
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`${product.name} thumbnail ${idx + 1}`}
+                      className="w-full h-full object-contain"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </motion.div>
 
         {/* Right column - Details */}
@@ -516,7 +587,7 @@ export default function ProductDetailPage() {
               <Link key={p.productId} to={`/products/${p.slug}`}>
                 <div className="lumina-card p-4 group cursor-pointer hover:translate-y-[-2px] transition-transform duration-300">
                   <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-stone-100 dark:bg-stone-800">
-                    <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={getFirstImage(p.images)} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{p.brand}</p>
                   <h3 className="font-display font-bold text-sm text-stone-900 dark:text-white line-clamp-1">{p.name}</h3>

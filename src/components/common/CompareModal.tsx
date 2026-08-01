@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, ArrowRight, GitCompareArrows, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCompare } from '../../context/CompareContext';
-import { formatPrice } from '../../utils/formatters';
+import { formatPrice, getFirstImage } from '../../utils/formatters';
 
 export default function CompareModal() {
   const { compareList, removeFromCompare, clearCompare, isCompareOpen, setCompareOpen } = useCompare();
@@ -52,7 +52,7 @@ export default function CompareModal() {
             {compareList.map(p => (
               <img
                 key={p.productId}
-                src={p.images && p.images[0] ? p.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&q=80'}
+                src={getFirstImage(p.images)}
                 alt={p.name}
                 className="w-7 h-7 rounded-full object-cover border border-stone-600"
               />
@@ -152,7 +152,7 @@ export default function CompareModal() {
 
                         <div className="aspect-square rounded-xl overflow-hidden bg-white dark:bg-stone-900 p-2 border border-stone-200/60 dark:border-stone-700">
                           <img
-                            src={p.images && p.images[0] ? p.images[0] : 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&q=80'}
+                            src={getFirstImage(p.images)}
                             alt={p.name}
                             className="w-full h-full object-contain"
                           />
