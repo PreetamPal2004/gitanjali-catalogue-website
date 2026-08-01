@@ -2,11 +2,13 @@ import { motion } from 'framer-motion';
 import { Star, Award, Users, Clock } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { staggerContainer, staggerItem, fadeInUp, pageTransition } from '../utils/animations';
 
 export default function AboutPage() {
   const { data, loading } = useCMS();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   const reasons = [
     { icon: Award, title: 'Authorized Dealer', desc: 'Official dealer for all major electronics brands.' },
@@ -16,11 +18,11 @@ export default function AboutPage() {
   ];
 
   return (
-    <motion.div variants={pageTransition} initial="initial" animate="animate" exit="exit" className="px-4 sm:px-6 py-8">
+    <motion.div variants={pageTransition} initial={isMobile ? false : "initial"} animate="animate" exit="exit" className="px-4 sm:px-6 py-8">
       <div className="max-w-7xl mx-auto space-y-16">
         {/* About section */}
         <div className="grid lg:grid-cols-2 gap-10 items-center">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="space-y-5">
+          <motion.div initial={isMobile ? false : "hidden"} animate="visible" variants={staggerContainer} className="space-y-5">
             <motion.h1 variants={staggerItem} className="font-display text-3xl sm:text-4xl font-bold">{t('about_title')}</motion.h1>
             <motion.p variants={staggerItem} className="text-slate-500 dark:text-slate-400 leading-relaxed">
               <strong>{data.businessInfo.shopName}</strong> has been Kolkata's premier electronics destination since 1995. We bring you the latest and best in televisions, refrigerators, air conditioners, washing machines, audio systems, and kitchen appliances from the world's top brands.
@@ -29,11 +31,13 @@ export default function AboutPage() {
               Our commitment to exceptional customer service, genuine products, competitive pricing, and comprehensive after-sales support has made us the trusted choice for over 28 years. Visit our spacious showroom to experience the latest technology firsthand.
             </motion.p>
           </motion.div>
-          <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+          <motion.div initial={isMobile ? false : { opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
             <div className="glass-card p-3 overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80"
                 alt="Showroom"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-64 sm:h-80 object-cover rounded-xl"
               />
             </div>
@@ -41,12 +45,12 @@ export default function AboutPage() {
         </div>
 
         {/* Why choose us */}
-        <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
+        <motion.section initial={isMobile ? false : "hidden"} whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-center mb-8">{t('about_why_choose')}</h2>
-          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <motion.div variants={staggerContainer} initial={isMobile ? false : "hidden"} whileInView="visible" viewport={{ once: true }} className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {reasons.map(item => (
               <motion.div key={item.title} variants={staggerItem}>
-                <motion.div className="glass-card p-6 text-center" whileHover={{ y: -6, scale: 1.02 }}>
+                <motion.div className="glass-card p-6 text-center" whileHover={isMobile ? undefined : { y: -6, scale: 1.02 }}>
                   <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary-500/20 to-accent-500/20 flex items-center justify-center">
                     <item.icon size={26} className="text-primary-600 dark:text-primary-400" />
                   </div>
@@ -83,12 +87,12 @@ export default function AboutPage() {
           }
 
           return testimonialsList.length > 0 ? (
-            <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
+            <motion.section initial={isMobile ? false : "hidden"} whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-center mb-8">{t('about_testimonials')}</h2>
-              <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <motion.div variants={staggerContainer} initial={isMobile ? false : "hidden"} whileInView="visible" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {testimonialsList.map((item, i) => (
                   <motion.div key={i} variants={staggerItem}>
-                    <motion.div className="lumina-card p-6 h-full flex flex-col justify-between" whileHover={{ y: -4 }}>
+                    <motion.div className="lumina-card p-6 h-full flex flex-col justify-between" whileHover={isMobile ? undefined : { y: -4 }}>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex gap-1">

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const fadeUp = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
 
@@ -35,6 +36,7 @@ function BrandSkeletonGrid() {
 export default function BrandsPage() {
   const { data, loading } = useCMS();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({});
 
   // Derive brands directly from Products sheet (filter active products)
@@ -105,7 +107,7 @@ export default function BrandsPage() {
       ) : (
         <motion.div
           variants={stagger}
-          initial="hidden"
+          initial={isMobile ? false : "hidden"}
           animate="visible"
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"
         >
@@ -123,6 +125,8 @@ export default function BrandsPage() {
                           <img
                             src={brand.brandLogo}
                             alt={brand.name}
+                            loading="lazy"
+                            decoding="async"
                             className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                             onError={() => handleImageError(brand.name)}
                           />

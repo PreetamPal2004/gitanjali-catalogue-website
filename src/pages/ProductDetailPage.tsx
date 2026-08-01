@@ -5,6 +5,7 @@ import { ArrowLeft, Phone, MessageCircle, Check, GitCompareArrows, Star, Message
 import { useCMS } from '../context/CMSContext';
 import { useCompare } from '../context/CompareContext';
 import { formatPrice, calcDiscount, whatsappLink, getFirstImage, getAllImages } from '../utils/formatters';
+import { useIsMobile } from '../hooks/useIsMobile';
 import type { Review } from '../types';
 
 const fadeUp = {
@@ -33,6 +34,7 @@ export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data, loading } = useCMS();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+  const isMobile = useIsMobile();
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -133,13 +135,14 @@ export default function ProductDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Left column - Images */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="lg:col-span-6 space-y-4">
+        <motion.div initial={isMobile ? false : "hidden"} animate="visible" variants={fadeUp} className="lg:col-span-6 space-y-4">
           <div className="lumina-card aspect-[4/3] rounded-3xl overflow-hidden relative border border-white/60 dark:border-white/10 p-4 group flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.img
                 key={selectedImageIndex}
                 src={productImages[selectedImageIndex] || productImages[0]}
                 alt={`${product.name} - View ${selectedImageIndex + 1}`}
+                decoding="async"
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
@@ -203,6 +206,8 @@ export default function ProductDetailPage() {
                     <img
                       src={imgUrl}
                       alt={`${product.name} thumbnail ${idx + 1}`}
+                      decoding="async"
+                      loading="lazy"
                       className="w-full h-full object-contain"
                     />
                   </button>
@@ -213,7 +218,7 @@ export default function ProductDetailPage() {
         </motion.div>
 
         {/* Right column - Details */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="lg:col-span-6 space-y-6">
+        <motion.div initial={isMobile ? false : "hidden"} animate="visible" variants={fadeUp} className="lg:col-span-6 space-y-6">
           <div className="space-y-2">
             {/* Brand Logo & Category above product name */}
             <div className="flex items-center gap-3 pb-1">
@@ -222,6 +227,8 @@ export default function ProductDetailPage() {
                   <img
                     src={brandLogoUrl}
                     alt={product.brand}
+                    decoding="async"
+                    loading="lazy"
                     className="max-h-full max-w-full object-contain filter dark:brightness-110"
                   />
                 </div>
@@ -587,7 +594,7 @@ export default function ProductDetailPage() {
               <Link key={p.productId} to={`/products/${p.slug}`}>
                 <div className="lumina-card p-4 group cursor-pointer hover:translate-y-[-2px] transition-transform duration-300">
                   <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-stone-100 dark:bg-stone-800">
-                    <img src={getFirstImage(p.images)} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={getFirstImage(p.images)} alt={p.name} decoding="async" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{p.brand}</p>
                   <h3 className="font-display font-bold text-sm text-stone-900 dark:text-white line-clamp-1">{p.name}</h3>

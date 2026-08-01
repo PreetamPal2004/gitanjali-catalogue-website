@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles, Star } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useLanguage } from '../context/LanguageContext';
 import { formatPrice, calcDiscount, getFirstImage } from '../utils/formatters';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -66,6 +67,7 @@ function BrandLogo({ logo, brand }: { logo: string; brand: string }) {
       src={logo}
       alt={brand}
       loading="lazy"
+      decoding="async"
       className="max-h-10 md:max-h-16 lg:max-h-20 max-w-[110px] md:max-w-[160px] lg:max-w-[200px] object-contain group-hover/item:scale-108 transition-transform duration-300 filter dark:brightness-110"
       onError={() => setFailed(true)}
     />
@@ -75,6 +77,7 @@ function BrandLogo({ logo, brand }: { logo: string; brand: string }) {
 export default function HomePage() {
   const { data, loading } = useCMS();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   
   const products = data.products || [];
   const brandsSheet = data.brands || [];
@@ -101,7 +104,7 @@ export default function HomePage() {
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-20">
       {/* ===== HERO SECTION ===== */}
       <motion.section
-        initial="hidden"
+        initial={isMobile ? false : "hidden"}
         animate="visible"
         variants={fadeUp}
         className="lumina-card p-8 md:p-14 overflow-hidden relative"
@@ -146,6 +149,7 @@ export default function HomePage() {
                     src={getFirstImage(heroProduct.images)}
                     alt={heroProduct.name}
                     loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
@@ -194,7 +198,7 @@ export default function HomePage() {
           </div>
         ) : (
           <motion.div
-            initial="hidden"
+            initial={isMobile ? false : "hidden"}
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             variants={stagger}
@@ -212,6 +216,7 @@ export default function HomePage() {
                             src={getFirstImage(product.images)}
                             alt={product.name}
                             loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                           {discount > 0 && (
@@ -322,7 +327,7 @@ export default function HomePage() {
 
       {/* ===== EDITORIAL BRAND STORY BANNER ===== */}
       <motion.section
-        initial="hidden"
+        initial={isMobile ? false : "hidden"}
         whileInView="visible"
         viewport={{ once: true, margin: '-50px' }}
         variants={fadeUp}
@@ -360,7 +365,7 @@ export default function HomePage() {
           </div>
 
           <motion.div
-            initial="hidden"
+            initial={isMobile ? false : "hidden"}
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
             variants={stagger}

@@ -54,6 +54,8 @@ export default function CompareModal() {
                 key={p.productId}
                 src={getFirstImage(p.images)}
                 alt={p.name}
+                decoding="async"
+                loading="lazy"
                 className="w-7 h-7 rounded-full object-cover border border-stone-600"
               />
             ))}
@@ -154,6 +156,8 @@ export default function CompareModal() {
                           <img
                             src={getFirstImage(p.images)}
                             alt={p.name}
+                            decoding="async"
+                            loading="lazy"
                             className="w-full h-full object-contain"
                           />
                         </div>

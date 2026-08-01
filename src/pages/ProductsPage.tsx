@@ -5,6 +5,7 @@ import { Grid3X3, List, ArrowRight, Plus, Check, Star, SlidersHorizontal, Chevro
 import { useCMS } from '../context/CMSContext';
 import { useCompare } from '../context/CompareContext';
 import { formatPrice, calcDiscount, getFirstImage } from '../utils/formatters';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -137,6 +138,13 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState<'low-to-high' | 'high-to-low'>('low-to-high');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(16);
+  const isMobile = useIsMobile();
+
+  // Reset visibleCount when filters change
+  useEffect(() => {
+    setVisibleCount(16);
+  }, [searchFromUrl, selectedCategory, selectedBrand, featuredOnly, sortBy]);
 
   // Sync state with URL search parameters
   useEffect(() => {
@@ -478,7 +486,7 @@ export default function ProductsPage() {
               <FeaturedLaunchSkeleton />
             ) : featuredLaunch ? (
               <motion.div
-                initial="hidden"
+                initial={isMobile ? false : "hidden"}
                 animate="visible"
                 variants={fadeUp}
                 className="hidden md:block lumina-card p-6 md:p-8 overflow-hidden relative"
@@ -589,102 +597,119 @@ export default function ProductsPage() {
               No products found matching your filter criteria.
             </div>
           ) : (
-            <motion.div
-              variants={stagger}
-              initial="hidden"
-              animate="visible"
-              className={view === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6' : 'space-y-4'}
-            >
-              {filtered.map(p => (
-                <motion.div key={p.productId} variants={fadeUp}>
-                  <Link to={`/products/${p.slug}`}>
-                    <div className="lumina-card p-3 sm:p-4 group cursor-pointer h-full flex flex-col justify-between hover:shadow-md hover:translate-y-[-2px] transition-all duration-300">
-                      <div>
-                        {/* Product Image */}
-                        <div className="aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-white/40 dark:bg-stone-800/40 border border-white/30 dark:border-stone-700/30 mb-2.5 relative">
-                          <img
-                            src={getFirstImage(p.images)}
-                            alt={p.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                          {p.featured && (
-                            <div className="absolute top-2 right-2 bg-white/30 dark:bg-stone-900/30 backdrop-blur-md text-black/80 dark:text-white/90 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-sm flex items-center gap-1 z-10 border border-white/40 dark:border-white/20">
-                              <Star size={9} className="fill-amber-500 text-amber-500" />
-                              <span className="tracking-wide hidden xs:inline">Featured</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Product Title */}
-                        <h3 className="font-display font-bold text-xs sm:text-sm text-stone-900 dark:text-white line-clamp-1 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors">
-                          {p.name}
-                        </h3>
-
-                        {/* Category + Specs Summary */}
-                        <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-1 truncate">{p.category}</p>
-                        <p className="text-[10px] sm:text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-1 ">
-                          {p.features.slice(0, 3).join(' • ')}
-                        </p>
-
-                        {/* Discount + Price Container with Top Border above discount */}
-                        <div className="mt-3 pt-2.5 border-t border-stone-200/40 dark:border-stone-700/40 space-y-1.5">
-                          {p.mrp > p.sellingPrice && (
-                            <div>
-                              <span className="text-[11px] sm:text-[13px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full inline-block">
-                                {calcDiscount(p.mrp, p.sellingPrice)}% OFF
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Price Line: Selling Price + Slashed MRP */}
-                          <div className="flex items-baseline gap-1.5 flex-wrap">
-                            <span className="text-stone-900 dark:text-white font-extrabold text-xl sm:text-xl">{formatPrice(p.sellingPrice)}</span>
-                            {p.mrp > p.sellingPrice && (
-                              <span className="text-[9px] sm:text-[10px] text-stone-400 line-through">{formatPrice(p.mrp)}</span>
+            <>
+              <motion.div
+                variants={stagger}
+                initial={isMobile ? false : "hidden"}
+                animate="visible"
+                className={view === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6' : 'space-y-4'}
+              >
+                {filtered.slice(0, visibleCount).map(p => (
+                  <motion.div key={p.productId} variants={fadeUp}>
+                    <Link to={`/products/${p.slug}`}>
+                      <div className="lumina-card p-3 sm:p-4 group cursor-pointer h-full flex flex-col justify-between hover:shadow-md hover:translate-y-[-2px] transition-all duration-300">
+                        <div>
+                          {/* Product Image */}
+                          <div className="aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-white/40 dark:bg-stone-800/40 border border-white/30 dark:border-stone-700/30 mb-2.5 relative">
+                            <img
+                              src={getFirstImage(p.images)}
+                              alt={p.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            {p.featured && (
+                              <div className="absolute top-2 right-2 bg-white/30 dark:bg-stone-900/30 backdrop-blur-md text-black/80 dark:text-white/90 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-sm flex items-center gap-1 z-10 border border-white/40 dark:border-white/20">
+                                <Star size={9} className="fill-amber-500 text-amber-500" />
+                                <span className="tracking-wide hidden xs:inline">Featured</span>
+                              </div>
                             )}
                           </div>
+
+                          {/* Product Title */}
+                          <h3 className="font-display font-bold text-xs sm:text-sm text-stone-900 dark:text-white line-clamp-1 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors">
+                            {p.name}
+                          </h3>
+
+                          {/* Category + Specs Summary */}
+                          <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-1 truncate">{p.category}</p>
+                          <p className="text-[10px] sm:text-[11px] text-stone-500 dark:text-stone-400 mt-0.5 line-clamp-1 ">
+                            {p.features.slice(0, 3).join(' • ')}
+                          </p>
+
+                          {/* Discount + Price Container with Top Border above discount */}
+                          <div className="mt-3 pt-2.5 border-t border-stone-200/40 dark:border-stone-700/40 space-y-1.5">
+                            {p.mrp > p.sellingPrice && (
+                              <div>
+                                <span className="text-[11px] sm:text-[13px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full inline-block">
+                                  {calcDiscount(p.mrp, p.sellingPrice)}% OFF
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Price Line: Selling Price + Slashed MRP */}
+                            <div className="flex items-baseline gap-1.5 flex-wrap">
+                              <span className="text-stone-900 dark:text-white font-extrabold text-xl sm:text-xl">{formatPrice(p.sellingPrice)}</span>
+                              {p.mrp > p.sellingPrice && (
+                                <span className="text-[9px] sm:text-[10px] text-stone-400 line-through">{formatPrice(p.mrp)}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Compare toggle footer */}
+                        <div className="pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-stone-200/50 dark:border-stone-800/50 flex items-center justify-between text-[9px] sm:text-[10px]">
+                          {(() => {
+                            const logoUrl = (p.brandLogo && p.brandLogo.trim())
+                              ? p.brandLogo.trim()
+                              : (data.brands || []).find(b => b.name.trim().toLowerCase() === (p.brand || '').trim().toLowerCase())?.logo || (data.brands || []).find(b => b.name.trim().toLowerCase() === (p.brand || '').trim().toLowerCase())?.brandLogo || '';
+
+                            if (logoUrl) {
+                              return (
+                                <div className="h-4 sm:h-5 max-w-[55px] sm:max-w-[75px] flex items-center shrink-0">
+                                  <img
+                                    src={logoUrl}
+                                    alt={p.brand}
+                                    decoding="async"
+                                    loading="lazy"
+                                    className="max-h-full max-w-full object-contain filter dark:brightness-110"
+                                  />
+                                </div>
+                              );
+                            }
+                            return (
+                              <span className="text-stone-400 font-medium truncate max-w-[65px] sm:max-w-none">{p.brand}</span>
+                            );
+                          })()}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              isInCompare(p.productId) ? removeFromCompare(p.productId) : addToCompare(p);
+                            }}
+                            className="text-stone-600 dark:text-stone-300 hover:text-stone-900 font-semibold text-[9px] sm:text-[10px]"
+                          >
+                            {isInCompare(p.productId) ? '✓ Compare' : '+ Compare'}
+                          </button>
                         </div>
                       </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </motion.div>
 
-                      {/* Compare toggle footer */}
-                      <div className="pt-2 sm:pt-3 mt-2 sm:mt-3 border-t border-stone-200/50 dark:border-stone-800/50 flex items-center justify-between text-[9px] sm:text-[10px]">
-                        {(() => {
-                          const logoUrl = (p.brandLogo && p.brandLogo.trim())
-                            ? p.brandLogo.trim()
-                            : (data.brands || []).find(b => b.name.trim().toLowerCase() === (p.brand || '').trim().toLowerCase())?.logo || (data.brands || []).find(b => b.name.trim().toLowerCase() === (p.brand || '').trim().toLowerCase())?.brandLogo || '';
-
-                          if (logoUrl) {
-                            return (
-                              <div className="h-4 sm:h-5 max-w-[55px] sm:max-w-[75px] flex items-center shrink-0">
-                                <img
-                                  src={logoUrl}
-                                  alt={p.brand}
-                                  className="max-h-full max-w-full object-contain filter dark:brightness-110"
-                                />
-                              </div>
-                            );
-                          }
-                          return (
-                            <span className="text-stone-400 font-medium truncate max-w-[65px] sm:max-w-none">{p.brand}</span>
-                          );
-                        })()}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            isInCompare(p.productId) ? removeFromCompare(p.productId) : addToCompare(p);
-                          }}
-                          className="text-stone-600 dark:text-stone-300 hover:text-stone-900 font-semibold text-[9px] sm:text-[10px]"
-                        >
-                          {isInCompare(p.productId) ? '✓ Compare' : '+ Compare'}
-                        </button>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.div>
+              {filtered.length > visibleCount && (
+                <div className="flex justify-center pt-6">
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 16)}
+                    className="lumina-btn group text-xs font-bold px-6 py-3 shadow-md flex items-center gap-2"
+                  >
+                    <span>Show More Products ({filtered.length - visibleCount} remaining)</span>
+                    <ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>

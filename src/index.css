@@ -456,6 +456,16 @@ html.dark input::placeholder, html.dark textarea::placeholder,
     backface-visibility: hidden;
   }
 
+  /* Disable sticky hover scale/translate transforms on mobile touch screens */
+  .hover\:scale-105:hover,
+  .hover\:scale-108:hover,
+  .group:hover .group-hover\:scale-105,
+  .hover\:translate-y-\[-2px\]:hover,
+  .hover\:translate-y-\[-4px\]:hover,
+  .hover\:translate-y-\[-6px\]:hover {
+    transform: none !important;
+  }
+
   /* Optimize touch scrolling performance & hardware composite cards */
   * {
     -webkit-overflow-scrolling: touch;

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const fadeUp = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
 
@@ -22,6 +23,7 @@ function OfferCardSkeleton() {
 export default function OffersPage() {
   const { data, loading } = useCMS();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const offersList = (data?.offers || []).filter(o => o.active !== false);
 
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -68,7 +70,7 @@ export default function OffersPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {offersList.map((offer, idx) => (
-            <motion.div key={offer.id || idx} variants={fadeUp} initial="hidden" animate="visible">
+            <motion.div key={offer.id || idx} variants={fadeUp} initial={isMobile ? false : "hidden"} animate="visible">
               <div className="lumina-card overflow-hidden group hover:shadow-lg transition-all">
                 {/* Clickable image section */}
                 <div
@@ -79,6 +81,8 @@ export default function OffersPage() {
                   <img
                     src={offer.image}
                     alt={offer.title}
+                    decoding="async"
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
@@ -168,6 +172,7 @@ export default function OffersPage() {
               <img
                 src={activeExpanded.image}
                 alt={activeExpanded.title}
+                decoding="async"
                 className="max-h-[75vh] max-w-full object-contain rounded-2xl shadow-2xl border border-white/10"
               />
 

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Truck, Shield, CreditCard, Wrench } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 import mockData from '../data/mockData';
 
 const iconMap: Record<string, React.ElementType> = { Truck, Shield, CreditCard, Wrench };
@@ -10,6 +11,7 @@ const fadeUp = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } };
 export default function ServicesPage() {
   const { data } = useCMS();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const servicesList = data?.services && data.services.length > 0 ? data.services : mockData.services;
 
   return (
@@ -28,7 +30,7 @@ export default function ServicesPage() {
           const Icon = iconMap[service.icon] || Truck;
           const features = service.features || [];
           return (
-            <motion.div key={service.id} variants={fadeUp} initial="hidden" animate="visible">
+            <motion.div key={service.id} variants={fadeUp} initial={isMobile ? false : "hidden"} animate="visible">
               <div className="lumina-card p-6 space-y-3">
                 <div className="w-10 h-10 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-900 dark:text-white">
                   <Icon size={20} />
